@@ -1,43 +1,81 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Scroll Layout</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-
-<div class="scene" id="scene">
-  <div class="sticky-stage">
-
-    <div class="label" id="label-1">01 - 대지 1</div>
-    <div class="label" id="label-3">03 - 아트보드 3</div>
-
-    <!-- 메인 (대지1) -->
-    <div class="frame" id="frame-main">
-      <img class="art" id="art-main" src="image.jpg">
-      <div class="grid"></div>
+  <!-- 1. 랜딩 페이지 -->
+  <section class="landing">
+    <div class="landing-inner">
+      <p class="landing-label">01 - 대지 1</p>
+      <div class="landing-frame">
+        <img src="images/main.jpg" alt="메인 이미지" />
+        <div class="grid-overlay"></div>
+      </div>
     </div>
+  </section>
 
-    <!-- 위 프레임 -->
-    <div class="frame" id="frame-top">
-      <img class="art" src="image.jpg">
-      <div class="grid"></div>
+  <!-- 2. 스크롤 후 나타나는 구성 -->
+  <section class="layout-section">
+    <div class="sticky-wrap">
+      <div class="layout-grid">
+        <div class="guide-lines"></div>
+
+        <p class="section-label left">02 - 대지 2</p>
+        <p class="section-label right">03 - 아트보드 3</p>
+
+        <!-- 위 큰 이미지 -->
+        <article
+          class="image-panel panel-top hover-panel"
+          data-text="명수대아파트는 경사와 조망, 그리고 흔적이 겹쳐 보이는 장소다."
+        >
+          <img src="images/main.jpg" alt="상단 이미지" />
+          <div class="panel-overlay">
+            <div class="panel-text"></div>
+          </div>
+          <div class="grid-overlay"></div>
+        </article>
+
+        <!-- 아래 큰 이미지 -->
+        <article
+          class="image-panel panel-bottom hover-panel"
+          data-text="스크롤 이후 장면은 분절된 조각처럼 이어지며 새로운 읽기를 만든다."
+        >
+          <img src="images/main.jpg" alt="하단 이미지" />
+          <div class="panel-overlay">
+            <div class="panel-text"></div>
+          </div>
+          <div class="grid-overlay"></div>
+        </article>
+
+        <!-- 작은 가로 이미지 -->
+        <article
+          class="image-panel panel-small-horizontal hover-panel"
+          data-text="창과 틈, 잘린 시선."
+        >
+          <img src="images/detail1.jpg" alt="가로 디테일 이미지" />
+          <div class="panel-overlay">
+            <div class="panel-text"></div>
+          </div>
+        </article>
+
+        <!-- 작은 세로 이미지 -->
+        <article
+          class="image-panel panel-small-vertical hover-panel"
+          data-text="세로로 남은 단면의 기록."
+        >
+          <img src="images/detail2.jpg" alt="세로 디테일 이미지" />
+          <div class="panel-overlay">
+            <div class="panel-text"></div>
+          </div>
+        </article>
+      </div>
     </div>
+  </section>
 
-    <!-- 아래 프레임 -->
-    <div class="frame" id="frame-bottom">
-      <img class="art" src="image.jpg">
-      <div class="grid"></div>
-
-      <img class="small-cut" id="cut-h" src="image.jpg">
-      <img class="small-cut" id="cut-v" src="image.jpg">
-    </div>
-
-  </div>
-</div>
-
-<script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
