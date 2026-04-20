@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scroll Layout</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="scene" id="scene">
+  <div class="sticky-stage">
+
+    <div class="label" id="label-1">01 - 대지 1</div>
+    <div class="label" id="label-3">03 - 아트보드 3</div>
+
+    <!-- 메인 (대지1) -->
+    <div class="frame" id="frame-main">
+      <img class="art" id="art-main" src="image.jpg">
+      <div class="grid"></div>
+    </div>
+
+    <!-- 위 프레임 -->
+    <div class="frame" id="frame-top">
+      <img class="art" src="image.jpg">
+      <div class="grid"></div>
+    </div>
+
+    <!-- 아래 프레임 -->
+    <div class="frame" id="frame-bottom">
+      <img class="art" src="image.jpg">
+      <div class="grid"></div>
+
+      <img class="small-cut" id="cut-h" src="image.jpg">
+      <img class="small-cut" id="cut-v" src="image.jpg">
+    </div>
+
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
