@@ -2,248 +2,32 @@
   box-sizing: border-box;
 }
 
+/* 전체 기본 */
 html, body {
   margin: 0;
   padding: 0;
+  background: rgb(242, 242, 242);
 }
 
+/* 스크롤 가능 */
 body {
-  font-family: "Helvetica Neue", Arial, sans-serif;
-  background: #666;
-  color: #ddd;
+  min-height: 600vh;
   overflow-x: hidden;
 }
 
-/* 공통 */
-img {
-  display: block;
+/* 핵심: 세로 라인 */
+.page {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
+  min-height: 600vh;
 
-.grid-overlay {
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(to right, rgba(110, 110, 110, 0.45) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(110, 110, 110, 0.32) 1px, transparent 1px);
-  background-size: 20% 20%;
-  pointer-events: none;
-  z-index: 3;
-}
+  background-color: rgb(242, 242, 242);
 
-/* 1. 랜딩 페이지 */
-.landing {
-  height: 100vh;
-  position: relative;
-  background: #666;
-}
-
-.landing-inner {
-  width: 100%;
-  height: 100%;
-  position: relative;
-}
-
-.landing-label {
-  position: absolute;
-  left: 5vw;
-  top: 40vh;
-  margin: 0;
-  font-size: 18px;
-  font-weight: 700;
-}
-
-.landing-frame {
-  position: absolute;
-  left: 5vw;
-  top: 43vh;
-  width: 41vw;
-  aspect-ratio: 1.52 / 1;
-  background: #efefef;
-  border: 1.5px solid rgba(20, 20, 20, 0.75);
-  overflow: hidden;
-}
-
-.landing-frame img {
-  transform: scale(1.02);
-}
-
-/* 2. 스크롤 섹션 */
-.layout-section {
-  height: 260vh;
-  position: relative;
-}
-
-.sticky-wrap {
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  overflow: hidden;
-}
-
-.layout-grid {
-  position: relative;
-  width: 100%;
-  height: 100vh;
-  display: grid;
-  grid-template-columns: 5vw repeat(8, 1fr) 5vw;
-  grid-template-rows: 6vh repeat(8, 1fr) 6vh;
-  background: #666;
-}
-
-/* 세로 가이드 라인 */
-.guide-lines {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
+  /* 세로 줄 */
   background-image: repeating-linear-gradient(
     to right,
     transparent 0,
-    transparent calc((100% - 10vw) / 8 - 1px),
-    rgba(135, 135, 135, 0.45) calc((100% - 10vw) / 8 - 1px),
-    rgba(135, 135, 135, 0.45) calc((100% - 10vw) / 8)
+    transparent 129.5px,
+    rgb(179, 179, 179) 129.5px,
+    rgb(179, 179, 179) 130.1667px
   );
-  background-size: calc((100% - 10vw) / 8) 100%;
-  background-position: 5vw 0;
-  background-repeat: repeat-x;
-}
-
-.section-label {
-  position: absolute;
-  margin: 0;
-  font-size: 18px;
-  font-weight: 700;
-  z-index: 10;
-}
-
-.section-label.left {
-  left: 5vw;
-  top: 40vh;
-}
-
-.section-label.right {
-  right: 5vw;
-  top: 40vh;
-}
-
-/* 이미지 패널 */
-.image-panel {
-  position: relative;
-  background: #ececec;
-  overflow: hidden;
-  border: 1.5px solid rgba(20, 20, 20, 0.75);
-  opacity: 0;
-  transform: translateY(60px);
-  transition:
-    opacity 0.8s ease,
-    transform 0.8s ease,
-    box-shadow 0.4s ease;
-}
-
-/* 스크롤 등장 후 */
-.layout-section.active .image-panel {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* 가이드 라인 안에 맞춘 배치 */
-.panel-top {
-  grid-column: 6 / 10;
-  grid-row: 1 / 6;
-  z-index: 2;
-}
-
-.panel-bottom {
-  grid-column: 6 / 10;
-  grid-row: 5 / 10;
-  z-index: 4;
-}
-
-.panel-small-horizontal {
-  grid-column: 6 / 7;
-  grid-row: 6 / 7;
-  align-self: center;
-  height: 42px;
-  z-index: 5;
-}
-
-.panel-small-vertical {
-  grid-column: 7 / 8;
-  grid-row: 8 / 10;
-  justify-self: center;
-  width: 14px;
-  z-index: 5;
-}
-
-/* 호버 효과 */
-.hover-panel img {
-  transition: transform 0.55s ease;
-}
-
-.hover-panel:hover img {
-  transform: scale(1.12);
-}
-
-.hover-panel:hover {
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
-}
-
-.panel-overlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: flex-end;
-  padding: 22px;
-  background: linear-gradient(to top, rgba(0,0,0,0.45), rgba(0,0,0,0.08), transparent);
-  opacity: 0;
-  transition: opacity 0.35s ease;
-  z-index: 6;
-}
-
-.hover-panel:hover .panel-overlay {
-  opacity: 1;
-}
-
-.panel-text {
-  color: #fff;
-  font-size: 15px;
-  line-height: 1.6;
-  letter-spacing: -0.01em;
-  max-width: 70%;
-  min-height: 1.6em;
-  white-space: pre-line;
-}
-
-.panel-small-horizontal .panel-overlay,
-.panel-small-vertical .panel-overlay {
-  padding: 10px;
-}
-
-.panel-small-horizontal .panel-text,
-.panel-small-vertical .panel-text {
-  font-size: 11px;
-  max-width: 100%;
-}
-
-/* 모바일 대응 */
-@media (max-width: 1100px) {
-  .landing-label,
-  .section-label {
-    font-size: 14px;
-  }
-
-  .landing-frame {
-    width: 52vw;
-  }
-
-  .panel-top {
-    grid-column: 5 / 10;
-  }
-
-  .panel-bottom {
-    grid-column: 5 / 10;
-  }
 }
