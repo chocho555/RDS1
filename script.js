@@ -1,36 +1,41 @@
-const scene = document.getElementById('scene');
+const layoutSection = document.querySelector(".layout-section");
+const hoverPanels = document.querySelectorAll(".hover-panel");
 
-const main = document.getElementById('frame-main');
-const topFrame = document.getElementById('frame-top');
-const bottomFrame = document.getElementById('frame-bottom');
+function revealOnScroll() {
+  const trigger = window.innerHeight * 0.72;
+  const top = layoutSection.getBoundingClientRect().top;
 
-const cutH = document.getElementById('cut-h');
-const cutV = document.getElementById('cut-v');
-
-const label1 = document.getElementById('label-1');
-const label3 = document.getElementById('label-3');
-
-function clamp(v, min, max) {
-  return Math.max(min, Math.min(max, v));
+  if (top < trigger) {
+    layoutSection.classList.add("active");
+  }
 }
 
-function update() {
-  const rect = scene.getBoundingClientRect();
-  const max = scene.offsetHeight - window.innerHeight;
-  const progress = clamp(-rect.top / max, 0, 1);
+window.addEventListener("scroll", revealOnScroll);
+window.addEventListener("load", revealOnScroll);
 
-  // 메인 이동
-  main.style.left = `${5 + progress * 45}vw`;
+/* 타이핑 효과 */
+hoverPanels.forEach((panel) => {
+  const textBox = panel.querySelector(".panel-text");
+  const fullText = panel.dataset.text;
+  let typingInterval = null;
 
-  // 등장
-  topFrame.style.opacity = progress;
-  bottomFrame.style.opacity = progress;
+  panel.addEventListener("mouseenter", () => {
+    clearInterval(typingInterval);
+    textBox.textContent = "";
 
-  cutH.style.opacity = progress;
-  cutV.style.opacity = progress;
+    let i = 0;
+    typingInterval = setInterval(() => {
+      textBox.textContent += fullText.charAt(i);
+      i++;
 
-  label1.style.opacity = 1 - progress;
-  label3.style.opacity = progress;
-}
+      if (i >= fullText.length) {
+        clearInterval(typingInterval);
+      }
+    }, 35);
+  });
 
-window.addEventListener('scroll', update);
+  panel.addEventListener("mouseleave", () => {
+    clearInterval(typingInterval);
+    textBox.textContent = "";
+  });
+});
