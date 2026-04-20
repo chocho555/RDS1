@@ -26,7 +26,7 @@ body {
   background-image: repeating-linear-gradient(
   to right,
   transparent 0,
-  transparent 150px,
-  rgb(179, 179, 179) 200px,
-  rgb(179, 179, 179) 200.6667px
+  transparent 300px,
+  rgb(179, 179, 179) 300px,
+  rgb(179, 179, 179) 300.6667px
 );
