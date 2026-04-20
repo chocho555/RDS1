@@ -22,11 +22,11 @@ body {
 
   background-color: rgb(242, 242, 242);
 
-  /* 세로 줄 */
   background-image: repeating-linear-gradient(
-  to right,
-  transparent 0,
-  transparent 300px,
-  rgb(179, 179, 179) 300px,
-  rgb(179, 179, 179) 300.6667px
-);
+    to right,
+    rgb(179,179,179) 0,
+    rgb(179,179,179) 0.5px,
+    transparent 0.5px,
+    transparent calc(100% / 8)
+  );
+}
