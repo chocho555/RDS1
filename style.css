@@ -24,10 +24,9 @@ body {
 
   /* 세로 줄 */
   background-image: repeating-linear-gradient(
-    to right,
-    transparent 0,
-    transparent 129.5px,
-    rgb(179, 179, 179) 129.5px,
-    rgb(179, 179, 179) 130.1667px
-  );
-}
+  to right,
+  transparent 0,
+  transparent 150px,
+  rgb(179, 179, 179) 150px,
+  rgb(179, 179, 179) 150.6667px
+);
