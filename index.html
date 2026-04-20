@@ -3,79 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Scroll Layout</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>Vertical Grid Page</title>
+
+  <!-- CSS 연결 -->
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- 1. 랜딩 페이지 -->
-  <section class="landing">
-    <div class="landing-inner">
-      <p class="landing-label">01 - 대지 1</p>
-      <div class="landing-frame">
-        <img src="images/main.jpg" alt="메인 이미지" />
-        <div class="grid-overlay"></div>
-      </div>
-    </div>
-  </section>
 
-  <!-- 2. 스크롤 후 나타나는 구성 -->
-  <section class="layout-section">
-    <div class="sticky-wrap">
-      <div class="layout-grid">
-        <div class="guide-lines"></div>
+  <div class="page"></div>
 
-        <p class="section-label left">02 - 대지 2</p>
-        <p class="section-label right">03 - 아트보드 3</p>
-
-        <!-- 위 큰 이미지 -->
-        <article
-          class="image-panel panel-top hover-panel"
-          data-text="명수대아파트는 경사와 조망, 그리고 흔적이 겹쳐 보이는 장소다."
-        >
-          <img src="images/main.jpg" alt="상단 이미지" />
-          <div class="panel-overlay">
-            <div class="panel-text"></div>
-          </div>
-          <div class="grid-overlay"></div>
-        </article>
-
-        <!-- 아래 큰 이미지 -->
-        <article
-          class="image-panel panel-bottom hover-panel"
-          data-text="스크롤 이후 장면은 분절된 조각처럼 이어지며 새로운 읽기를 만든다."
-        >
-          <img src="images/main.jpg" alt="하단 이미지" />
-          <div class="panel-overlay">
-            <div class="panel-text"></div>
-          </div>
-          <div class="grid-overlay"></div>
-        </article>
-
-        <!-- 작은 가로 이미지 -->
-        <article
-          class="image-panel panel-small-horizontal hover-panel"
-          data-text="창과 틈, 잘린 시선."
-        >
-          <img src="images/detail1.jpg" alt="가로 디테일 이미지" />
-          <div class="panel-overlay">
-            <div class="panel-text"></div>
-          </div>
-        </article>
-
-        <!-- 작은 세로 이미지 -->
-        <article
-          class="image-panel panel-small-vertical hover-panel"
-          data-text="세로로 남은 단면의 기록."
-        >
-          <img src="images/detail2.jpg" alt="세로 디테일 이미지" />
-          <div class="panel-overlay">
-            <div class="panel-text"></div>
-          </div>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <script src="script.js"></script>
 </body>
 </html>
