@@ -14,7 +14,7 @@ body {
   width: 100vw;
   height: 100vh;
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(6, 1fr); /* 6칸으로 변경 */
 }
 
 .column {
