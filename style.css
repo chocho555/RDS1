@@ -39,3 +39,16 @@ body {
   display: block;
   height: 200vh;
 }
+
+.floating-graphic {
+  position: fixed;
+  top: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  width: 80vw;
+  height: auto;
+
+  z-index: 10;
+  pointer-events: none;
+}
