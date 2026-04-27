@@ -26,22 +26,14 @@ columns.forEach((column, colIndex) => {
 
     // 🔥 4번째 칸 (index 3)만 특별하게 처리
     if (colIndex === 3) {
-      // 각 이미지마다 간격 다르게
-      if (i === 0) {
-        box.style.marginTop = '200px';
-        box.style.marginBottom = '120px';
-      } else if (i === 1) {
-        box.style.marginTop = '350px';
-        box.style.marginBottom = '180px';
-      } else if (i === 2) {
-        box.style.marginTop = '500px';
-        box.style.marginBottom = '220px';
-      }
-    } else {
-      // 나머지 칸은 기존 랜덤
-      box.style.marginTop = `${80 + Math.random() * 300}px`;
-      box.style.marginBottom = `${80 + Math.random() * 200}px`;
-    }
+  const basePositions = [180, 520, 900];
+
+  box.style.marginTop = `${basePositions[i] + Math.random() * 80}px`;
+  box.style.marginBottom = `${180 + Math.random() * 220}px`;
+} else {
+  box.style.marginTop = `${80 + Math.random() * 300}px`;
+  box.style.marginBottom = `${80 + Math.random() * 200}px`;
+}
 
     box.appendChild(img);
     column.appendChild(box);
