@@ -39,3 +39,22 @@ columns.forEach((column, colIndex) => {
     column.appendChild(box);
   }
 });
+const preview = document.createElement('img');
+preview.classList.add('hover-preview');
+document.body.appendChild(preview);
+
+document.querySelectorAll('.img-box img').forEach(img => {
+  img.addEventListener('mouseenter', () => {
+    preview.src = img.src;
+    preview.style.display = 'block';
+  });
+
+  img.addEventListener('mousemove', (e) => {
+    preview.style.left = `${e.clientX}px`;
+    preview.style.top = `${e.clientY}px`;
+  });
+
+  img.addEventListener('mouseleave', () => {
+    preview.style.display = 'none';
+  });
+});
