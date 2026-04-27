@@ -53,3 +53,19 @@ body {
   z-index: 9999;
   pointer-events: none;
 }
+
+.column {
+  height: 100vh;
+  overflow-y: scroll;
+  border-right: 0.5px solid rgb(230, 230, 230);
+  padding: 24px;
+  font-size: 20px;
+
+  /* 스크롤바 숨기기 */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.column::-webkit-scrollbar {
+  display: none;
+}
