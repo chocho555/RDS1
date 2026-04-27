@@ -27,7 +27,7 @@ body {
 .column {
   height: 100vh;
   overflow-y: scroll;
-  overflow-x: visible; /* 🔥 hover 시 이미지 밖으로 나오게 */
+  overflow-x: hidden; /* 칸 안에서만 보이게 */
   border-right: 0.5px solid rgb(230, 230, 230);
   padding: 24px;
 
@@ -57,37 +57,30 @@ body {
 
 .img-box {
   width: 100%;
-  height: 20px;              /* 기본: 얇은 상태 */
-  overflow: visible;         /* 🔥 밖으로 튀어나오게 */
-  position: relative;
-  z-index: 1;
-}
-
-/* 기본 상태 (얇은 라인처럼 보이게) */
-.img-box {
-  width: 100%;
-  height: 20px;
+  height: 20px; /* 기본: 얇은 라인 */
   overflow: hidden;
-  cursor: pointer;
+  transition: height 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
+/* 기본 상태 */
 .img-box img {
   width: 100%;
   height: 20px;
   object-fit: cover;
   display: block;
+  transition: all 0.45s ease;
 }
 
-/* hover 때 뜨는 큰 이미지 */
-.hover-preview {
-  position: fixed;
-  width: 360px;
-  height: auto;
-  z-index: 99999;
-  pointer-events: none;
-  display: none;
-  transform: translate(-50%, -50%);
+/* hover 상태 */
+.img-box:hover {
+  height: 260px; /* 펼쳐지는 높이 (조절 가능) */
 }
+
+.img-box:hover img {
+  height: 100%;
+  object-fit: contain; /* 🔥 원본 비율 유지 + 전체 보이기 */
+}
+
 /* ========================= */
 /* 떠있는 SVG 그래픽 */
 /* ========================= */
@@ -104,23 +97,4 @@ body {
 
   z-index: 9999;
   pointer-events: none;
-}
-.lightbox {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.32);
-  z-index: 100000;
-  display: none;
-  align-items: center;
-  justify-content: center;
-}
-
-.lightbox img {
-  width: 66vw;
-  max-height: 78vh;
-  object-fit: contain;
-}
-
-.lightbox.active {
-  display: flex;
 }
