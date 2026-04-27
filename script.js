@@ -75,3 +75,20 @@ document.querySelectorAll('.img-box img').forEach(img => {
 lightbox.addEventListener('click', () => {
   lightbox.classList.remove('active');
 });
+const lightbox = document.createElement('div');
+lightbox.classList.add('lightbox');
+
+const lightboxImg = document.createElement('img');
+lightbox.appendChild(lightboxImg);
+document.body.appendChild(lightbox);
+
+document.querySelectorAll('.img-box img').forEach(img => {
+  img.addEventListener('click', () => {
+    lightboxImg.src = img.src;
+    lightbox.classList.add('active');
+  });
+});
+
+lightbox.addEventListener('click', () => {
+  lightbox.classList.remove('active');
+});
