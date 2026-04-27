@@ -98,3 +98,22 @@ body {
   z-index: 9999;
   pointer-events: none;
 }
+.lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.32);
+  z-index: 100000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.lightbox img {
+  width: 66vw;
+  max-height: 78vh;
+  object-fit: contain;
+}
+
+.lightbox.active {
+  display: flex;
+}
