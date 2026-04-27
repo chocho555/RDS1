@@ -1,6 +1,5 @@
 const columns = document.querySelectorAll('.column');
 
-// 사용할 이미지 리스트 (JPG 폴더 기준)
 const images = [
   'JPG/img1.jpg',
   'JPG/img2.jpg',
@@ -10,16 +9,27 @@ const images = [
   'JPG/img6.jpg'
 ];
 
-// 각 칸마다 랜덤 이미지 여러 개 넣기
-columns.forEach(column => {
-  for (let i = 0; i < 5; i++) { // 칸당 이미지 개수
-    const randomIndex = Math.floor(Math.random() * images.length);
+// 각 칸에 들어갈 이미지 개수
+const layout = [1, 0, 2, 3, 0, 1];
 
+let imgIndex = 0;
+
+columns.forEach((column, colIndex) => {
+  const count = layout[colIndex];
+
+  for (let i = 0; i < count; i++) {
     const box = document.createElement('div');
     box.classList.add('img-box');
 
+    // 🔥 세로 위치 랜덤 (간격 다양하게)
+    box.style.marginTop = `${80 + Math.random() * 300}px`;
+    box.style.marginBottom = `${80 + Math.random() * 200}px`;
+
     const img = document.createElement('img');
-    img.src = images[randomIndex];
+
+    // 이미지 순서대로 사용 (겹치지 않게)
+    img.src = images[imgIndex % images.length];
+    imgIndex++;
 
     box.appendChild(img);
     column.appendChild(box);
