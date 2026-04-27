@@ -25,14 +25,11 @@ columns.forEach((column, colIndex) => {
 
     const img = document.createElement('img');
     img.src = images[imgIndex % images.length];
+    img.alt = `image ${imgIndex + 1}`;
+
+    box.appendChild(img);
+    column.appendChild(box);
 
     imgIndex++;
-
-    box.appendChild(img);
-    column.appendChild(box);
-  }
-});
-    box.appendChild(img);
-    column.appendChild(box);
   }
 });
