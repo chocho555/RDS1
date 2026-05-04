@@ -5,21 +5,19 @@ const gapWidth = 20;
 
 let leftRatio = 0.5;
 let targetRatio = 0.5;
-
-let velocity = 0; // 🔥 속도 추가
+let velocity = 0;
 
 function updatePanels() {
   const totalWidth = window.innerWidth;
   const usableWidth = totalWidth - gapWidth;
 
-  // 🔥 스프링 물리 느낌
-  const force = (targetRatio - leftRatio) * 0.08; // 당기는 힘
+  // 아주 느리고 묵직한 쫀득 모션
+  const force = (targetRatio - leftRatio) * 0.015;
   velocity += force;
-  velocity *= 0.75; // 감쇠 (쫀득함 핵심)
+  velocity *= 0.88;
 
   leftRatio += velocity;
 
-  // 범위 제한
   leftRatio = Math.max(0.001, Math.min(0.999, leftRatio));
 
   const leftWidth = usableWidth * leftRatio;
