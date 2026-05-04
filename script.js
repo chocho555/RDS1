@@ -23,3 +23,8 @@ window.addEventListener('scroll', () => {
 
   image.src = images[imageIndex];
 });
+if (progress > 0.05) {
+  frame.classList.add('active');
+} else {
+  frame.classList.remove('active');
+}
