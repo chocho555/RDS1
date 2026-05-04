@@ -39,3 +39,14 @@ rightPanel.addEventListener('mouseenter', () => {
 });
 
 updatePanels();
+
+// 얼마나 줄어들지 (0.92 = 위아래 8% 보임)
+const minScale = 0.92;
+
+// 가운데일수록 덜 줄고, 끝으로 갈수록 더 줄어듦
+const centerDist = Math.abs(leftRatio - 0.5) * 2; // 0~1
+const scaleY = 1 - (1 - minScale) * centerDist;
+
+// 적용
+leftPanel.style.transform = `scaleY(${scaleY})`;
+rightPanel.style.transform = `scaleY(${scaleY})`;
