@@ -1,30 +1,61 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Cloth</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
 <div class="wrap">
   <div class="pole left"></div>
   <div class="pole right"></div>
 
-  <svg class="cloth" viewBox="0 0 900 520" preserveAspectRatio="none">
+  <svg class="cloth"
+       viewBox="0 0 900 520"
+       preserveAspectRatio="none"
+       xmlns:xlink="http://www.w3.org/1999/xlink">
+
     <defs>
-      <pattern id="clothTexture" patternUnits="userSpaceOnUse" width="900" height="520">
-<image href="./JPG/cloth.jpg" width="900" height="520" preserveAspectRatio="xMidYMid slice" />
+      <pattern id="clothTexture"
+               patternUnits="userSpaceOnUse"
+               width="900"
+               height="520">
+
+        <!-- ⭐ 여기 중요 (경로 수정됨) -->
+        <image xlink:href="./JPG/cloth.jpg"
+               width="900"
+               height="520"
+               preserveAspectRatio="xMidYMid slice" />
       </pattern>
 
       <filter id="wave">
-        <feTurbulence type="fractalNoise" baseFrequency="0.012 0.035" numOctaves="2" seed="3">
+        <feTurbulence type="fractalNoise"
+                      baseFrequency="0.012 0.035"
+                      numOctaves="2"
+                      seed="3">
           <animate attributeName="baseFrequency"
-            dur="4s"
-            values="0.012 0.035; 0.018 0.045; 0.012 0.035"
-            repeatCount="indefinite" />
+                   dur="4s"
+                   values="0.012 0.035; 0.018 0.045; 0.012 0.035"
+                   repeatCount="indefinite" />
         </feTurbulence>
+
         <feDisplacementMap in="SourceGraphic" scale="18" />
       </filter>
     </defs>
 
     <path
-      class="cloth-shape"
+      fill="url(#clothTexture)"
+      filter="url(#wave)"
       d="M 20 80
          C 260 120, 610 140, 880 70
          L 880 480
          C 620 510, 310 480, 20 360
          Z" />
+
   </svg>
 </div>
+
+</body>
+</html>
