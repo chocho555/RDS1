@@ -1,7 +1,7 @@
 const frame = document.querySelector('.frame');
 const image = document.querySelector('#scrollImage');
 
-const images = [
+const JPG = [
   './images/img1.jpg',
   './images/img2.jpg',
   './images/img3.jpg',
