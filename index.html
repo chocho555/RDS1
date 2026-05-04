@@ -1,16 +1,27 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <title>Cloth</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>Moving Panels</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
 
-<div class="wrap">
-  <div class="cloth"></div>
-</div>
+  <div class="stage">
+    <img src="./image.jpg" class="hidden-image" />
 
+    <!-- 가로로 움직이는 세로 판 -->
+    <div class="panel vertical" style="left: 15%;"></div>
+    <div class="panel vertical" style="left: 35%;"></div>
+    <div class="panel vertical" style="left: 55%;"></div>
+    <div class="panel vertical" style="left: 75%;"></div>
+
+    <!-- 세로로 움직이는 가로 판 -->
+    <div class="panel horizontal" style="top: 25%;"></div>
+    <div class="panel horizontal" style="top: 55%;"></div>
+    <div class="panel horizontal" style="top: 80%;"></div>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
