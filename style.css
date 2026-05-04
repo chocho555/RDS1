@@ -1,40 +1,55 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
 body {
+  margin: 0;
   background: #f2f2f2;
-  height: 500vh;
-  overflow-x: hidden;
-}
-
-.scroll-section {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
   height: 100vh;
-
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.frame {
-  width: 8px;          /* 🔥 지금의 절반 (18px → 8px 정도 추천) */
-  height: 85vh;
-  overflow: hidden;
-
-  transform: scale(1);
-  transition: transform 0.1s linear;
+.wrap {
+  position: relative;
+  width: 900px;
+  height: 620px;
 }
 
-.frame img {
-  width: 500%;         /* 🔥 더 크게 (얇아져도 디테일 유지) */
-  height: 100%;
-  object-fit: cover;
+.pole {
+  position: absolute;
+  top: 40px;
+  width: 16px;
+  height: 560px;
+  background: #333;
+  z-index: 1;
+}
 
-  transform: translateX(-48%); /* 🔥 중앙 맞추기 */
+.left {
+  left: 0;
+}
+
+.right {
+  right: 0;
+}
+
+.cloth {
+  position: absolute;
+  top: 80px;
+  left: 0;
+  width: 900px;
+  height: 520px;
+  z-index: 2;
+  animation: clothMove 3.5s ease-in-out infinite;
+}
+
+.cloth-shape {
+  fill: url(#clothTexture);
+  filter: url(#wave);
+}
+
+@keyframes clothMove {
+  0%, 100% {
+    transform: translateY(0) skewX(0deg);
+  }
+  50% {
+    transform: translateY(8px) skewX(1.5deg);
+  }
 }
