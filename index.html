@@ -1,18 +1,30 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Scroll Image Frame</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
+<div class="wrap">
+  <div class="pole left"></div>
+  <div class="pole right"></div>
 
-  <section class="scroll-section">
-    <div class="frame">
-  <img id="img1" src="./JPG/img1.JPG">
-  <img id="img2" src="./JPG/img2.JPG">
+  <svg class="cloth" viewBox="0 0 900 520" preserveAspectRatio="none">
+    <defs>
+      <pattern id="clothTexture" patternUnits="userSpaceOnUse" width="900" height="520">
+        <image href="./cloth.jpg" width="900" height="520" preserveAspectRatio="xMidYMid slice" />
+      </pattern>
+
+      <filter id="wave">
+        <feTurbulence type="fractalNoise" baseFrequency="0.012 0.035" numOctaves="2" seed="3">
+          <animate attributeName="baseFrequency"
+            dur="4s"
+            values="0.012 0.035; 0.018 0.045; 0.012 0.035"
+            repeatCount="indefinite" />
+        </feTurbulence>
+        <feDisplacementMap in="SourceGraphic" scale="18" />
+      </filter>
+    </defs>
+
+    <path
+      class="cloth-shape"
+      d="M 20 80
+         C 260 120, 610 140, 880 70
+         L 880 480
+         C 620 510, 310 480, 20 360
+         Z" />
+  </svg>
 </div>
-  <script src="script.js"></script>
-</body>
-</html>
