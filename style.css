@@ -23,9 +23,8 @@ body {
 }
 
 .frame {
-  width: 18px;
-  height: 70vh;
-  background: #333;
+  width: 8px;          /* 🔥 지금의 절반 (18px → 8px 정도 추천) */
+  height: 85vh;
   overflow: hidden;
 
   transform: scale(1);
@@ -33,37 +32,9 @@ body {
 }
 
 .frame img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0;
-  transition: opacity 0.5s ease;
-}
-
-.frame.active img {
-  opacity: 1;
-}
-
-.frame.active {
-  background: transparent;
-}
-.frame {
-  position: relative;
-}
-
-.frame img {
-  position: absolute;
-  top: 0;
-  left: 0;
-
-  width: 300%;
+  width: 500%;         /* 🔥 더 크게 (얇아져도 디테일 유지) */
   height: 100%;
   object-fit: cover;
 
-  transform: translateX(-45%);
-  transition: opacity 0.6s ease;
-}
-
-#img2 {
-  opacity: 0;
+  transform: translateX(-48%); /* 🔥 중앙 맞추기 */
 }
