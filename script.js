@@ -1,11 +1,11 @@
 const frame = document.querySelector('.frame');
 const image = document.querySelector('#scrollImage');
 
-const JPG = [
-  './images/img1.jpg',
-  './images/img2.jpg',
-  './images/img3.jpg',
-  './images/img4.jpg'
+const images = [
+  './JPG/img1.JPG',
+  './JPG/img2.JPG',
+  './JPG/img3.JPG',
+  './JPG/img4.JPG'
 ];
 
 window.addEventListener('scroll', () => {
@@ -13,11 +13,9 @@ window.addEventListener('scroll', () => {
   const maxScroll = document.body.scrollHeight - window.innerHeight;
   const progress = scrollY / maxScroll;
 
-  // 이미지가 가까워지는 느낌
   const scale = 1 + progress * 45;
   frame.style.transform = `scale(${scale})`;
 
-  // 스크롤에 따라 이미지 변경
   const imageIndex = Math.min(
     images.length - 1,
     Math.floor(progress * images.length)
