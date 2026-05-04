@@ -30,15 +30,25 @@ body {
     10% 65%
   );
 
-  animation: wind 4s ease-in-out infinite;
+  animation: flapBottom 4s ease-in-out infinite;
 }
 
-/* 🔥 바람 느낌 (세로 고정) */
-@keyframes wind {
+@keyframes flapBottom {
   0%, 100% {
-    transform: skewX(0deg);
+    clip-path: polygon(
+      10% 10%,
+      90% 15%,
+      90% 95%,
+      10% 65%
+    );
   }
+
   50% {
-    transform: skewX(1.5deg);
+    clip-path: polygon(
+      10% 10%,
+      90% 15%,
+      90% 88%,
+      10% 70%
+    );
   }
 }
