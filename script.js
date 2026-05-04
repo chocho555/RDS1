@@ -1,48 +1,37 @@
-const panels = document.querySelectorAll('.panel');
 const stage = document.querySelector('.stage');
+const leftPanel = document.querySelector('.left');
+const rightPanel = document.querySelector('.right');
+const gap = document.querySelector('.gap');
 
-let activePanel = null;
-let startX = 0;
-let startY = 0;
-let startLeft = 0;
-let startTop = 0;
+let gapX = window.innerWidth / 2; // 시작 위치 (가운데)
+const gapWidth = 80;
 
-panels.forEach(panel => {
-  panel.addEventListener('mousedown', e => {
-    activePanel = panel;
+let timer = null;
 
-    startX = e.clientX;
-    startY = e.clientY;
+function updateLayout() {
+  gap.style.left = `${gapX}px`;
 
-    startLeft = panel.offsetLeft;
-    startTop = panel.offsetTop;
+  leftPanel.style.width = `${gapX}px`;
 
-    e.preventDefault();
-  });
+  rightPanel.style.width = `${window.innerWidth - (gapX + gapWidth)}px`;
+}
+
+// 초기 세팅
+updateLayout();
+
+// 호버 시간 → 위치 이동
+stage.addEventListener('mouseenter', () => {
+  timer = setInterval(() => {
+    gapX += 5; // 👉 이동 속도 (조절 가능)
+    
+    // 화면 밖 안 나가게 제한
+    const max = window.innerWidth - gapWidth;
+    if (gapX > max) gapX = max;
+
+    updateLayout();
+  }, 60);
 });
 
-document.addEventListener('mousemove', e => {
-  if (!activePanel) return;
-
-  const stageRect = stage.getBoundingClientRect();
-
-  if (activePanel.classList.contains('vertical')) {
-    const dx = e.clientX - startX;
-    let newLeft = startLeft + dx;
-
-    newLeft = Math.max(0, Math.min(newLeft, stageRect.width - activePanel.offsetWidth));
-    activePanel.style.left = `${newLeft}px`;
-  }
-
-  if (activePanel.classList.contains('horizontal')) {
-    const dy = e.clientY - startY;
-    let newTop = startTop + dy;
-
-    newTop = Math.max(0, Math.min(newTop, stageRect.height - activePanel.offsetHeight));
-    activePanel.style.top = `${newTop}px`;
-  }
-});
-
-document.addEventListener('mouseup', () => {
-  activePanel = null;
+stage.addEventListener('mouseleave', () => {
+  clearInterval(timer);
 });
