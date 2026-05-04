@@ -26,12 +26,10 @@ body {
   z-index: 2;
 }
 
-/* 왼쪽 */
 .left {
   left: 0;
 }
 
-/* 오른쪽 */
 .right {
   right: 0;
 }
