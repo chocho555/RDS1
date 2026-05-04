@@ -18,12 +18,11 @@ body {
   width: 100%;
   height: 100%;
 
-  background-image: url("./JPG/cloth.jpg");
-  background-size: 1200px auto;
-  background-position: center 40%;
+  background-image: url("/RDS1/JPG/cloth.jpg");
+  background-size: cover;
+  background-position: center;
   background-repeat: no-repeat;
 
-  /* 🔥 네가 준 형태 */
   clip-path: polygon(
     10% 10%,
     90% 15%,
@@ -31,7 +30,6 @@ body {
     10% 65%
   );
 
-  /* 🔥 핵심: 좌우로만 미세하게 흔들림 */
   animation: wind 4s ease-in-out infinite;
 }
 
