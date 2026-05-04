@@ -40,11 +40,6 @@ body {
   animation: clothMove 3.5s ease-in-out infinite;
 }
 
-.cloth-shape {
-  fill: url(#clothTexture);
-  filter: url(#wave);
-}
-
 @keyframes clothMove {
   0%, 100% {
     transform: translateY(0) skewX(0deg);
