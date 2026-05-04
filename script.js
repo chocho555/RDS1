@@ -1,37 +1,34 @@
-const stage = document.querySelector('.stage');
 const leftPanel = document.querySelector('.left');
 const rightPanel = document.querySelector('.right');
-const gap = document.querySelector('.gap');
 
-let gapX = window.innerWidth / 2; // 시작 위치 (가운데)
-const gapWidth = 80;
+const gapWidth = 80; // 이미지가 보이는 틈 크기
+let leftRatio = 0.18; // 처음 왼쪽 판넬 비율
+let targetRatio = 0.18;
 
-let timer = null;
+function updatePanels() {
+  const totalWidth = window.innerWidth;
+  const usableWidth = totalWidth - gapWidth;
 
-function updateLayout() {
-  gap.style.left = `${gapX}px`;
+  // 부드럽게 따라가는 모션
+  leftRatio += (targetRatio - leftRatio) * 0.06;
 
-  leftPanel.style.width = `${gapX}px`;
+  const leftWidth = usableWidth * leftRatio;
+  const rightWidth = usableWidth - leftWidth;
 
-  rightPanel.style.width = `${window.innerWidth - (gapX + gapWidth)}px`;
+  leftPanel.style.width = `${leftWidth}px`;
+  rightPanel.style.width = `${rightWidth}px`;
+
+  requestAnimationFrame(updatePanels);
 }
 
-// 초기 세팅
-updateLayout();
-
-// 호버 시간 → 위치 이동
-stage.addEventListener('mouseenter', () => {
-  timer = setInterval(() => {
-    gapX += 5; // 👉 이동 속도 (조절 가능)
-    
-    // 화면 밖 안 나가게 제한
-    const max = window.innerWidth - gapWidth;
-    if (gapX > max) gapX = max;
-
-    updateLayout();
-  }, 60);
+leftPanel.addEventListener('mouseenter', () => {
+  targetRatio = 0.75; 
 });
 
-stage.addEventListener('mouseleave', () => {
-  clearInterval(timer);
+rightPanel.addEventListener('mouseenter', () => {
+  targetRatio = 0.15;
 });
+
+window.addEventListener('resize', updatePanels);
+
+updatePanels();
