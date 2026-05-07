@@ -3,22 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Depth Slit</title>
+  <title>Slit Scroll Visual</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="image-layer">
-    <img id="bgImage" src="images/img1.jpg" />
-  </div>
 
-  <div class="slit-wrapper">
-    <div class="slit">
-      <img id="slitImage" src="images/img1.jpg" />
+  <main class="scene">
+
+    <div class="slit-wrapper">
+      <div class="slit">
+        <img id="slitImage" src="images/img1.jpg" alt="changing image" />
+      </div>
     </div>
-  </div>
 
-  <div class="panel left"></div>
-  <div class="panel right"></div>
+    <div class="panel left"></div>
+    <div class="panel right"></div>
+
+  </main>
 
   <script src="script.js"></script>
 </body>
