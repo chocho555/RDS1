@@ -21,21 +21,31 @@ setInterval(() => {
 window.addEventListener("scroll", () => {
   const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
   const progress = Math.min(window.scrollY / maxScroll, 1);
+
   const eased = 1 - Math.pow(1 - progress, 3);
 
-  const scale = 1 + eased * 18;
-  const panelMove = eased * 4.5;
-  const imageScale = 1 + eased * 0.6;
+  // 세로는 빠르게 커짐
+  const heightProgress = Math.min(eased * 1.8, 1);
+  const slitHeight = 120 + (window.innerHeight - 120) * heightProgress;
 
-  slitWrapper.style.transform =
-    `translate(-50%, -50%) scale(${scale})`;
+  // 가로는 늦게, 천천히 커짐
+  const widthProgress = Math.max((eased - 0.25) / 0.75, 0);
+  const widthEased = widthProgress * widthProgress * (3 - 2 * widthProgress);
+
+  const slitWidth = 6 + (window.innerWidth * 0.09 - 6) * widthEased;
+
+  // 이미지도 가까워지는 느낌
+  const imageScale = 1 + eased * 0.7;
+
+  slitWrapper.style.width = `${slitWidth}px`;
+  slitWrapper.style.height = `${slitHeight}px`;
 
   slitImage.style.transform =
     `translate(-50%, -50%) scale(${imageScale})`;
 
   leftPanel.style.transform =
-    `translateX(-${panelMove}vw)`;
+    `translateX(-${slitWidth / 2}px)`;
 
   rightPanel.style.transform =
-    `translateX(${panelMove}vw)`;
+    `translateX(${slitWidth / 2}px)`;
 });
