@@ -38,3 +38,19 @@ window.addEventListener("scroll", () => {
   changingImage.style.transform =
     `scale(${scale})`;
 });
+/* 세로 길이 증가 */
+
+const panelHeight = 30 + scrollY * 0.08;
+const panelTop = 35 - scrollY * 0.04;
+
+document.querySelector(".left").style.height =
+  `${panelHeight}vh`;
+
+document.querySelector(".right").style.height =
+  `${panelHeight}vh`;
+
+document.querySelector(".left").style.top =
+  `${panelTop}vh`;
+
+document.querySelector(".right").style.top =
+  `${panelTop}vh`;
