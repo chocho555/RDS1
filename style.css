@@ -30,25 +30,31 @@ body{
 /* 판 */
 .panel{
   position:fixed;
-  top:0;
-  height:100vh;
   background:#fff;
   z-index:2;
 
-  transition:width 0.1s linear;
+  transition:
+    width 0.1s linear,
+    height 0.1s linear,
+    top 0.1s linear;
 }
 
-/* 초기 틈 */
-:root{
-  --gap: 6px;
-}
+/* 초기에는 짧은 세로 틈 */
 
 .left{
   left:0;
+
+  top:35vh;
+  height:30vh;
+
   width:calc(50vw - var(--gap)/2);
 }
 
 .right{
   right:0;
+
+  top:35vh;
+  height:30vh;
+
   width:calc(50vw - var(--gap)/2);
 }
