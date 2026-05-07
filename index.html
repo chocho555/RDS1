@@ -2,19 +2,18 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>Sliding Gap</title>
-  <link rel="stylesheet" href="./style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Slit Image Layer</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-
-  <div class="stage">
-    <img src="./image.jpg" class="bg" />
-
-    <div class="panel left"></div>
-    <div class="gap"></div>
-    <div class="panel right"></div>
+  <div class="image-layer">
+    <img id="changingImage" src="images/img1.jpg" alt="changing image" />
   </div>
 
-  <script src="./script.js"></script>
+  <div class="panel left"></div>
+  <div class="panel right"></div>
+
+  <script src="script.js"></script>
 </body>
 </html>
