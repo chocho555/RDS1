@@ -10,7 +10,8 @@ body{
   height:500vh;
 }
 
-/* 이미지 레이어 */
+/* 이미지 */
+
 .image-layer{
   position:fixed;
   inset:0;
@@ -27,34 +28,60 @@ body{
   transition:transform 0.2s linear;
 }
 
-/* 판 */
+/* 패널 */
+
 .panel{
   position:fixed;
+  top:0;
+  height:100vh;
   background:#fff;
-  z-index:2;
-
-  transition:
-    width 0.1s linear,
-    height 0.1s linear,
-    top 0.1s linear;
+  z-index:3;
 }
 
-/* 초기에는 짧은 세로 틈 */
+/* 틈 */
+
+.slit{
+  position:fixed;
+
+  left:50%;
+  transform:translateX(-50%);
+
+  width:6px;
+  height:30vh;
+
+  top:35vh;
+
+  overflow:hidden;
+
+  z-index:2;
+}
+
+.slit img{
+  position:absolute;
+
+  width:100vw;
+  height:100vh;
+
+  object-fit:cover;
+
+  left:50%;
+  top:50%;
+
+  transform:
+    translate(-50%, -50%)
+    scale(1);
+
+  transition:transform 0.2s linear;
+}
+
+/* 판 위치 */
 
 .left{
   left:0;
-
-  top:35vh;
-  height:30vh;
-
-  width:calc(50vw - var(--gap)/2);
+  width:calc(50vw - 3px);
 }
 
 .right{
   right:0;
-
-  top:35vh;
-  height:30vh;
-
-  width:calc(50vw - var(--gap)/2);
+  width:calc(50vw - 3px);
 }
