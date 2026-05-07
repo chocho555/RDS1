@@ -48,4 +48,21 @@ window.addEventListener("scroll", () => {
 
   rightPanel.style.transform =
     `translateX(${slitWidth / 2}px)`;
+  const flipCard = document.querySelector(".flip-card");
+
+let startX = 0;
+let endX = 0;
+
+window.addEventListener("touchstart", (e) => {
+  startX = e.touches[0].clientX;
+});
+
+window.addEventListener("touchend", (e) => {
+  endX = e.changedTouches[0].clientX;
+
+  const diff = endX - startX;
+
+  if (Math.abs(diff) > 80) {
+    flipCard.classList.toggle("is-flipped");
+  }
 });
