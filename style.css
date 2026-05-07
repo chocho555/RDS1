@@ -46,13 +46,11 @@ body {
   width: 6px;
   height: 120px;
 
-  transform: translate(-50%, -50%) scale(1);
+  transform: translate(-50%, -50%);
   transform-origin: center center;
 
   overflow: hidden;
   z-index: 3;
-
-  will-change: transform, filter;
 }
 
 /* 실제 이미지가 보이는 영역 */
