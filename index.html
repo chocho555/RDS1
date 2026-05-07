@@ -7,22 +7,30 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <div class="flip-scene">
+    <div class="flip-card">
 
-  <main class="scene">
+      <section class="front">
+        <main class="scene">
+          <div class="slit-wrapper">
+            <div class="slit">
+              <img id="slitImage" src="images/img1.jpg" alt="changing image" />
+            </div>
+          </div>
 
-   <div class="flip-scene">
-  <div class="flip-card">
-    <section class="front">
-      <!-- 지금 만든 슬릿 화면 -->
-    </section>
+          <div class="panel left"></div>
+          <div class="panel right"></div>
+        </main>
+      </section>
 
-    <section class="back">
-      <!-- 뒤집혔을 때 나올 화면 -->
-    </section>
+      <section class="back">
+        <div class="back-content">
+          <h1>Back Side</h1>
+        </div>
+      </section>
+
+    </div>
   </div>
-</div>
-
-  </main>
 
   <script src="script.js"></script>
 </body>
