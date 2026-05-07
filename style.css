@@ -1,47 +1,49 @@
-body {
+* {
   margin: 0;
-  overflow: hidden;
-  background: #f2f2f2;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-.stage {
+body {
+  background: #fff;
   width: 100vw;
   height: 100vh;
-  position: relative;
+  overflow: hidden;
 }
 
-/* 이미지 */
-.bg {
+/* 아래 이미지 레이어 */
+.image-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+}
+
+.image-layer img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-/* 공통 판넬 */
+/* 위에 덮이는 두 개의 흰 판 */
 .panel {
-  position: absolute;
+  position: fixed;
   top: 0;
-  height: 100%;
-  background: white;
+  height: 100vh;
+  background: #fff;
   z-index: 2;
-
-  transform-origin: center;
-  will-change: transform;
 }
 
-.left {
+/* 가운데 틈 두께 */
+:root {
+  --gap: 10px;
+}
+
+.panel.left {
   left: 0;
+  width: calc(50vw - var(--gap) / 2);
 }
 
-.right {
+.panel.right {
   right: 0;
-}
-
-/* 틈 (이미지 보이는 영역) */
-.gap {
-  position: absolute;
-  top: 0;
-  width: 80px; /* 🔥 틈 크기 고정 */
-  height: 100%;
-  z-index: 1;
+  width: calc(50vw - var(--gap) / 2);
 }
