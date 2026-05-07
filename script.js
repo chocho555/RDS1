@@ -20,10 +20,26 @@ setInterval(() => {
 
 window.addEventListener("scroll", () => {
   const maxScroll = document.body.scrollHeight - window.innerHeight;
-  const progress = window.scrollY / maxScroll;
+  const progress = Math.min(window.scrollY / maxScroll, 1);
 
-  const scale = 1 + progress * 18;
+  const eased = progress * progress * (3 - 2 * progress);
+
+  const slitScale = 1 + eased * 24;
+  const imageScale = 1 + eased * 1.8;
+  const panelMove = eased * 48;
+  const blur = 6 - eased * 6;
 
   slitWrapper.style.transform =
-    `translate(-50%, -50%) scale(${scale})`;
+    `translate(-50%, -50%) scale(${slitScale})`;
+
+  slitImage.style.transform =
+    `translate(-50%, -50%) scale(${imageScale})`;
+
+  document.querySelector(".left").style.transform =
+    `translateX(-${panelMove}vw)`;
+
+  document.querySelector(".right").style.transform =
+    `translateX(${panelMove}vw)`;
+
+  slitWrapper.style.filter = `blur(${blur}px)`;
 });
