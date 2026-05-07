@@ -42,26 +42,20 @@ body {
 }
 
 /* 틈 전체를 카메라처럼 확대 */
-.slit-wrapper{
-  position:fixed;
+.slit-wrapper {
+  position: fixed;
+  left: 50%;
+  top: 50%;
 
-  left:50%;
-  top:50%;
+  width: 6px;
+  height: 120px;
 
-  width:6px;
-  height:120px;
+  transform: translate(-50%, -50%) scale(1);
+  transform-origin: center center;
 
-  transform:
-    translate(-50%, -50%)
-    translateZ(-1200px);
-
-  transform-style:preserve-3d;
-
-  z-index:4;
-
-  overflow:hidden;
-
-  will-change:transform;
+  z-index: 4;
+  overflow: hidden;
+  will-change: transform, filter;
 }
 
 /* 실제 보이는 틈 */
