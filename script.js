@@ -19,6 +19,7 @@ setInterval(() => {
   slitImage.src = images[index];
 }, 1000);
 
+/* 스크롤: 틈 가까워지는 효과 */
 window.addEventListener("scroll", () => {
   const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
   const progress = Math.min(window.scrollY / maxScroll, 1);
@@ -46,17 +47,24 @@ window.addEventListener("scroll", () => {
     `translateX(${slitWidth / 2}px)`;
 });
 
-let startX = 0;
+/* 마우스 드래그: 화면 뒤집기 */
+let mouseStartX = 0;
+let isDragging = false;
 
-window.addEventListener("touchstart", (e) => {
-  startX = e.touches[0].clientX;
+window.addEventListener("mousedown", (e) => {
+  mouseStartX = e.clientX;
+  isDragging = true;
 });
 
-window.addEventListener("touchend", (e) => {
-  const endX = e.changedTouches[0].clientX;
-  const diff = endX - startX;
+window.addEventListener("mouseup", (e) => {
+  if (!isDragging) return;
+
+  const mouseEndX = e.clientX;
+  const diff = mouseEndX - mouseStartX;
 
   if (Math.abs(diff) > 80) {
     flipCard.classList.toggle("is-flipped");
   }
+
+  isDragging = false;
 });
