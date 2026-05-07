@@ -175,4 +175,6 @@ body::-webkit-scrollbar {
     scale(1);
 
   will-change: transform;
+
+  user-select: none;
 }
