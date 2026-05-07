@@ -52,6 +52,7 @@ body {
   transform-origin: center center;
   z-index: 4;
   overflow: hidden;
+  will-change: transform, filter;
 }
 
 /* 실제 보이는 틈 */
