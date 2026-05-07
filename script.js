@@ -24,22 +24,23 @@ window.addEventListener("scroll", () => {
 
   const eased = progress * progress * (3 - 2 * progress);
 
-  const slitScale = 1 + eased * 24;
-  const imageScale = 1 + eased * 1.8;
-  const panelMove = eased * 48;
-  const blur = 6 - eased * 6;
+  const minSlitWidth = 6;
+  const maxSlitWidth = window.innerWidth * 0.09; // 최대 폭
+  const slitWidth = minSlitWidth + (maxSlitWidth - minSlitWidth) * eased;
 
-  slitWrapper.style.transform =
-    `translate(-50%, -50%) scale(${slitScale})`;
+  const minSlitHeight = 150;
+  const maxSlitHeight = window.innerHeight;
+  const slitHeight = minSlitHeight + (maxSlitHeight - minSlitHeight) * eased;
+
+  const imageScale = 1 + eased * 0.8;
+  const blur = 4 - eased * 4;
+
+  slitWrapper.style.width = `${slitWidth}px`;
+  slitWrapper.style.height = `${slitHeight}px`;
+  slitWrapper.style.transform = `translate(-50%, -50%) scale(1)`;
 
   slitImage.style.transform =
     `translate(-50%, -50%) scale(${imageScale})`;
-
-  document.querySelector(".left").style.transform =
-    `translateX(-${panelMove}vw)`;
-
-  document.querySelector(".right").style.transform =
-    `translateX(${panelMove}vw)`;
 
   slitWrapper.style.filter = `blur(${blur}px)`;
 });
