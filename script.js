@@ -1,5 +1,3 @@
-/* 이미지 전환 */
-
 const images = [
   "images/img1.jpg",
   "images/img2.jpg",
@@ -8,49 +6,55 @@ const images = [
   "images/img5.jpg"
 ];
 
-const changingImage = document.getElementById("changingImage");
+const bgImage = document.getElementById("bgImage");
+const slitImage = document.getElementById("slitImage");
 
 let index = 0;
 
+/* 이미지 변경 */
+
 setInterval(() => {
+
   index = (index + 1) % images.length;
-  changingImage.src = images[index];
+
+  bgImage.src = images[index];
+  slitImage.src = images[index];
+
 }, 1000);
 
 
-/* Z축 거리감 */
+/* 거리감 */
 
 window.addEventListener("scroll", () => {
 
   const scrollY = window.scrollY;
 
-  /* 틈 확대 */
-  const gap = 6 + scrollY * 0.12;
+  /* 틈 넓이 */
 
-  document.documentElement.style.setProperty(
-    "--gap",
-    `${gap}px`
-  );
+  const gap = 6 + scrollY * 0.15;
 
-  /* 이미지 살짝 확대 */
+  document.querySelector(".slit").style.width =
+    `${gap}px`;
+
+  /* 틈 높이 */
+
+  const height = 30 + scrollY * 0.08;
+
+  document.querySelector(".slit").style.height =
+    `${height}vh`;
+
+  /* 위치 */
+
+  const top = 35 - scrollY * 0.04;
+
+  document.querySelector(".slit").style.top =
+    `${top}vh`;
+
+  /* 이미지 확대 */
+
   const scale = 1 + scrollY * 0.0005;
 
-  changingImage.style.transform =
-    `scale(${scale})`;
+  slitImage.style.transform =
+    `translate(-50%, -50%) scale(${scale})`;
+
 });
-/* 세로 길이 증가 */
-
-const panelHeight = 30 + scrollY * 0.08;
-const panelTop = 35 - scrollY * 0.04;
-
-document.querySelector(".left").style.height =
-  `${panelHeight}vh`;
-
-document.querySelector(".right").style.height =
-  `${panelHeight}vh`;
-
-document.querySelector(".left").style.top =
-  `${panelTop}vh`;
-
-document.querySelector(".right").style.top =
-  `${panelTop}vh`;
