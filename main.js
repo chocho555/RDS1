@@ -63,8 +63,8 @@ function inertia() {
     velX = velY = 0;
     return;
   }
-  velX *= 0.8;
-  velY *= 0.8;
+  velX *= 0.9.5;
+  velY *= 0.9.5;
   x += velX;
   y += velY;
   wrapPosition();
