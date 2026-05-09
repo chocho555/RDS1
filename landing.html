@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portfolio</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: #f5f3f0;
+      font-family: 'Courier New', monospace;
+    }
+
+    /* ── 클릭 가능한 돌 요소 ──────────────────────────
+       이미지가 왼쪽 위에 있으므로 left / top 으로 배치
+       hover 시 scale 커짐 + cursor pointer
+    ─────────────────────────────────────────────────── */
+    #enter {
+      position: absolute;
+      left: 4vw;
+      top: 4vh;
+      width: 140px;         /* ★ 돌 크기 조절 */
+      cursor: pointer;
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      /* cubic-bezier: 살짝 튀어오르는 느낌 */
+    }
+
+    #enter:hover {
+      transform: scale(1.18);
+    }
+
+    #enter img {
+      width: 100%;
+      height: auto;
+      display: block;
+      /* PNG 흰 배경이 있다면 multiply로 배경과 자연스럽게 합성 */
+      mix-blend-mode: multiply;
+    }
+
+    /* ── 페이지 전환 오버레이 ─────────────────────────
+       클릭 시 흰색 페이드아웃 후 index.html로 이동
+    ─────────────────────────────────────────────────── */
+    #overlay {
+      position: fixed;
+      inset: 0;
+      background: #f5f3f0;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.6s ease;
+      z-index: 99;
+    }
+
+    #overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="overlay"></div>
+
+  <div id="enter" title="enter">
+    <img src="images/landing.png" alt="enter" draggable="false" />
+  </div>
+
+  <script>
+    const enter   = document.getElementById('enter');
+    const overlay = document.getElementById('overlay');
+
+    enter.addEventListener('click', () => {
+      overlay.classList.add('active');
+      /* 페이드 끝나면 탐색 페이지로 이동 */
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 650);
+    });
+  </script>
+</body>
+</html>
