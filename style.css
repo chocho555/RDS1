@@ -13,11 +13,11 @@ body {
   height: 100vh;
   overflow: hidden;
   background: #f0ede8;
-  cursor: grab;
+  
   font-family: 'Courier New', monospace;
 }
 
-body.dragging {
+body {
   cursor: grabbing;
 }
 
