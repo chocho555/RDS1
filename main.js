@@ -7,37 +7,59 @@ const viewport = document.getElementById('viewport');
 const hint     = document.getElementById('ui-hint');
 const coordsEl = document.getElementById('ui-coords');
 
+/* ── 타일 크기 설정 ───────────────────────────────
+   이미지 원본: 4000 × 2500px
+   SCALE 값을 높이면 더 크게 확대됨 (= 더 좁은 시야)
+   SCALE 1.0 = 원본 크기, 1.5 = 1.5배 확대
+─────────────────────────────────────────────────── */
+const IMG_W = 4000;
+const IMG_H = 2500;
+const SCALE = 1.5;
+
+const TILE_W = IMG_W * SCALE;   /* 타일 1장 너비 = 6000px */
+const TILE_H = IMG_H * SCALE;   /* 타일 1장 높이 = 3750px */
+
+/* 캔버스 = 타일 3×3 */
+canvas.style.width  = TILE_W * 3 + 'px';
+canvas.style.height = TILE_H * 3 + 'px';
+
+/* 타일 크기 적용 */
+document.querySelectorAll('.tile').forEach((tile, i) => {
+  const col = i % 3;
+  const row = Math.floor(i / 3);
+  tile.style.width  = TILE_W + 'px';
+  tile.style.height = TILE_H + 'px';
+  tile.style.left   = col * TILE_W + 'px';
+  tile.style.top    = row * TILE_H + 'px';
+});
+
+/* ── 시작 위치: 중앙 타일의 중심이 화면 중앙에 오도록 ── */
+let x = -(TILE_W - window.innerWidth)  / 2 - TILE_W;
+let y = -(TILE_H - window.innerHeight) / 2 - TILE_H;
+
 let isDragging = false;
 let startX = 0, startY = 0;
-let x = 0, y = 0;           /* 현재 캔버스 이동량 */
-let velX = 0, velY = 0;     /* 관성용 속도 */
+let velX = 0, velY = 0;
 let prevX = 0, prevY = 0;
 let rafId = null;
 let hintHidden = false;
 
-/* ── 타일 1장 크기 = 뷰포트 크기 ─────────────────── */
-function tileW() { return viewport.offsetWidth; }
-function tileH() { return viewport.offsetHeight; }
-
-/* ── 캔버스에 이동 적용 + 좌표 갱신 ─────────────── */
+/* ── 캔버스 이동 적용 ─────────────────────────────  */
 function applyTransform() {
   canvas.style.transform = `translate(${x}px, ${y}px)`;
   coordsEl.textContent =
-    `${Math.round((((-x) % tileW()) + tileW()) % tileW())} / ` +
-    `${Math.round((((-y) % tileH()) + tileH()) % tileH())}`;
+    `${Math.round((((-x) % TILE_W) + TILE_W) % TILE_W)} / ` +
+    `${Math.round((((-y) % TILE_H) + TILE_H) % TILE_H)}`;
 }
 
-/* ── 무한 루프 핵심 ───────────────────────────────
-   이동량이 타일 1장 크기를 벗어나면
-   정확히 1장만큼 snap → 눈에 보이는 변화 없이 위치 초기화
+/* ── 무한 루프: 타일 1장 크기 벗어나면 snap ─────────
+   눈에 보이는 변화 없이 위치 초기화
 ─────────────────────────────────────────────────── */
 function wrapPosition() {
-  const tw = tileW();
-  const th = tileH();
-  if (x > 0)    x -= tw;
-  if (x < -tw)  x += tw;
-  if (y > 0)    y -= th;
-  if (y < -th)  y += th;
+  if (x > -TILE_W + window.innerWidth)  x -= TILE_W;
+  if (x < -TILE_W * 2 + window.innerWidth) x += TILE_W;
+  if (y > -TILE_H + window.innerHeight) y -= TILE_H;
+  if (y < -TILE_H * 2 + window.innerHeight) y += TILE_H;
 }
 
 /* ── 드래그 시작 ──────────────────────────────────  */
@@ -50,7 +72,6 @@ function onDown(cx, cy) {
   velX = velY = 0;
   document.body.classList.add('dragging');
   cancelAnimationFrame(rafId);
-
   if (!hintHidden) {
     hint.classList.add('hidden');
     hintHidden = true;
@@ -79,8 +100,7 @@ function onUp() {
 }
 
 /* ── 관성 이동 ────────────────────────────────────
-   손을 뗀 뒤 속도가 0.3 이하가 될 때까지 계속 이동
-   0.91 = 감속 계수 (낮출수록 빨리 멈춤, 높일수록 오래 미끄러짐)
+   0.91 = 감속 계수 (낮추면 빨리 멈춤, 높이면 오래 미끄러짐)
 ─────────────────────────────────────────────────── */
 function inertia() {
   if (Math.abs(velX) < 0.3 && Math.abs(velY) < 0.3) return;
