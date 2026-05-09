@@ -84,7 +84,7 @@ function hideHint() {
    마우스 휠: deltaY 만 있으므로 상하 이동
    SPEED 로 감도 조절
 ──────────────────────────────────────────────── */
-const SPEED = 1.2;  /* ★ 스크롤 감도 (높이면 더 빠름) */
+const SPEED = 0.8;  /* ★ 스크롤 감도 (높이면 더 빠름) */
 
 window.addEventListener('wheel', e => {
   e.preventDefault();
