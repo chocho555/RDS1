@@ -2,36 +2,40 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Slit Scroll Visual</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Portfolio</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="flip-scene">
-    <div class="flip-card">
 
-      <section class="front">
-        <main class="scene">
-          <div class="slit-wrapper">
-            <div class="slit">
-              <img id="slitImage" src="images/img1.jpg" alt="changing image" />
-            </div>
-          </div>
+  <div id="ui-hint">drag to explore</div>
+  <div id="ui-coords">0 / 0</div>
 
-          <div class="panel left"></div>
-          <div class="panel right"></div>
-        </main>
-      </section>
+  <!-- ① 시야 제한 창 -->
+  <div id="viewport">
 
-      <section class="back">
-        <div class="back-content">
-          <h1>Back Side</h1>
-        </div>
-      </section>
+    <!-- ② 무한 루프 배경 캔버스 -->
+    <div id="canvas">
+      <!--
+        3×3 타일 배치
+        left = 열번호 × 33.333%
+        top  = 행번호 × 33.333%
+      -->
+      <div class="tile" style="left:0%;       top:0%"></div>
+      <div class="tile" style="left:33.3334%; top:0%"></div>
+      <div class="tile" style="left:66.6667%; top:0%"></div>
 
+      <div class="tile" style="left:0%;       top:33.3334%"></div>
+      <div class="tile" style="left:33.3334%; top:33.3334%"></div>
+      <div class="tile" style="left:66.6667%; top:33.3334%"></div>
+
+      <div class="tile" style="left:0%;       top:66.6667%"></div>
+      <div class="tile" style="left:33.3334%; top:66.6667%"></div>
+      <div class="tile" style="left:66.6667%; top:66.6667%"></div>
     </div>
+
   </div>
 
-  <script src="script.js"></script>
+  <script src="main.js"></script>
 </body>
 </html>
