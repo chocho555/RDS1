@@ -12,7 +12,7 @@ const coordsEl = document.getElementById('ui-coords');
 ─────────────────────────────────────────────────── */
 const IMG_W = 4000;
 const IMG_H = 2500;
-const SCALE = 1.2;   /* ★ 확대 배율 조절 */
+const SCALE = 1.4;   /* ★ 확대 배율 조절 */
 
 const TILE_W = IMG_W * SCALE;
 const TILE_H = IMG_H * SCALE;
@@ -63,8 +63,8 @@ function inertia() {
     velX = velY = 0;
     return;
   }
-  velX *= 0.92;
-  velY *= 0.92;
+  velX *= 0.8;
+  velY *= 0.8;
   x += velX;
   y += velY;
   wrapPosition();
@@ -84,7 +84,7 @@ function hideHint() {
    마우스 휠: deltaY 만 있으므로 상하 이동
    SPEED 로 감도 조절
 ──────────────────────────────────────────────── */
-const SPEED = 0.8;  /* ★ 스크롤 감도 (높이면 더 빠름) */
+const SPEED = 0.5;  /* ★ 스크롤 감도 (높이면 더 빠름) */
 
 window.addEventListener('wheel', e => {
   e.preventDefault();
