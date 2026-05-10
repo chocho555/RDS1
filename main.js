@@ -1,25 +1,24 @@
 /* =====================================================
-   main.js
+   main.js — 최적화 + 슬라이드쇼 무한 루프
    ===================================================== */
 
-/* ── 요소 참조 ── */
 const layerBg    = document.getElementById('layer-bg');
 const layerSlide = document.getElementById('layer-slideshow');
 const layerFg    = document.getElementById('layer-fg');
 const hint       = document.getElementById('ui-hint');
 
 /* =====================================================
-   1. 배경 타일 (무한 루프 3×3)
+   1. 타일 크기 세팅
    ===================================================== */
 const IMG_W  = 4000;
 const IMG_H  = 2500;
 const SCALE  = 1.2;
-const TILE_W = IMG_W * SCALE;
-const TILE_H = IMG_H * SCALE;
+const TILE_W = IMG_W * SCALE;  /* 4800px */
+const TILE_H = IMG_H * SCALE;  /* 3000px */
 
+/* 배경 타일 */
 layerBg.style.width  = TILE_W * 3 + 'px';
 layerBg.style.height = TILE_H * 3 + 'px';
-
 document.querySelectorAll('.tile').forEach((tile, i) => {
   const col = i % 3, row = Math.floor(i / 3);
   tile.style.width  = TILE_W + 'px';
@@ -29,129 +28,137 @@ document.querySelectorAll('.tile').forEach((tile, i) => {
 });
 
 /* =====================================================
-   2. 슬라이드쇼 — 빨간 마스크 안에만 표시
-   Canvas 2개를 사용:
-     maskCanvas: 요소1_mask.png 를 그려서 마스크로 사용
-     slideCanvas: 슬라이드 이미지를 그린 뒤
-                  destination-in 으로 마스크 모양만 남김
+   2. 슬라이드쇼 캔버스 — 3×3 타일로 무한 반복
    ===================================================== */
-const slideCanvas = document.getElementById('slideshow-canvas');
-const slideCtx    = slideCanvas.getContext('2d');
-const wrap        = document.getElementById('slideshow-wrap');
+const wrap   = document.getElementById('slideshow-wrap');
+const canvas = document.getElementById('slideshow-canvas');
+const ctx    = canvas.getContext('2d');
 
-const SW = TILE_W;
-const SH = TILE_H;
-slideCanvas.width  = SW;
-slideCanvas.height = SH;
-wrap.style.width   = SW + 'px';
-wrap.style.height  = SH + 'px';
+/* 캔버스 = 배경과 동일한 3×3 크기 */
+const CW = TILE_W * 3;
+const CH = TILE_H * 3;
+canvas.width  = CW;
+canvas.height = CH;
+wrap.style.width   = CW + 'px';
+wrap.style.height  = CH + 'px';
+/* 배경 레이어와 동일하게 -1타일 offset에서 시작 */
+wrap.style.position = 'absolute';
+wrap.style.top      = -TILE_H + 'px';
+wrap.style.left     = -TILE_W + 'px';
 
-/* 마스크 이미지 로드 */
+/* 마스크 이미지 */
 const maskImg = new Image();
 maskImg.src = 'images/요소1_mask.png';
 
 /*
-  슬라이드 이미지 경로
-  images/slides/001.jpg ~ 050.jpg
-  ★ 실제 파일로 교체하세요
+  슬라이드 이미지 — images/slides/001.jpg ~ 050.jpg
 */
-const SLIDE_SRCS = Array.from({ length: 50 }, (_, i) =>
-  `images/slides/${String(i + 1).padStart(3, '0')}.jpg`
-);
-const SLIDE_INTERVAL = 120; /* ms — 낮출수록 빠름 */
+const SLIDE_COUNT    = 50;
+const SLIDE_INTERVAL = 120; /* ms, 낮출수록 빠름 */
 
 const slideImgs  = [];
-let slidesLoaded = 0;
+let loadedCount  = 0;
 let currentSlide = 0;
-let slideTimer   = null;
+let lastDrawTime = 0;
+let maskReady    = false;
+let slidesReady  = false;
 
-function drawSlide() {
-  slideCtx.clearRect(0, 0, SW, SH);
+/* 오프스크린 캔버스: 타일 1장 크기로 슬라이드 합성 */
+const offscreen = document.createElement('canvas');
+offscreen.width  = TILE_W;
+offscreen.height = TILE_H;
+const offCtx = offscreen.getContext('2d');
 
-  /* ① 슬라이드 이미지 그리기 */
+function compositeSlide() {
+  /* ① 슬라이드 이미지를 오프스크린에 cover로 그림 */
+  offCtx.clearRect(0, 0, TILE_W, TILE_H);
   const img = slideImgs[currentSlide];
   if (img && img.complete && img.naturalWidth) {
     const iw = img.naturalWidth, ih = img.naturalHeight;
-    const sc = Math.max(SW / iw, SH / ih);
+    const sc = Math.max(TILE_W / iw, TILE_H / ih);
     const dw = iw * sc, dh = ih * sc;
-    slideCtx.drawImage(img, (SW - dw) / 2, (SH - dh) / 2, dw, dh);
-  } else {
-    /* 플레이스홀더: 슬라이드별 다른 색 */
-    slideCtx.fillStyle = `hsl(${currentSlide * 7}, 40%, 40%)`;
-    slideCtx.fillRect(0, 0, SW, SH);
+    offCtx.drawImage(img, (TILE_W - dw) / 2, (TILE_H - dh) / 2, dw, dh);
   }
 
-  /*
-    ② destination-in 합성:
-    "이미 그려진 내용" × "새로 그리는 알파"
-    → 마스크 PNG의 불투명한 픽셀(빨간/선)만 남고 나머지는 투명
-  */
-  if (maskImg.complete && maskImg.naturalWidth) {
-    slideCtx.globalCompositeOperation = 'destination-in';
-    slideCtx.drawImage(maskImg, 0, 0, SW, SH);
-    slideCtx.globalCompositeOperation = 'source-over'; /* 원상복구 */
+  /* ② destination-in: 마스크 모양만 남김 */
+  if (maskReady) {
+    offCtx.globalCompositeOperation = 'destination-in';
+    offCtx.drawImage(maskImg, 0, 0, TILE_W, TILE_H);
+    offCtx.globalCompositeOperation = 'source-over';
   }
 }
 
-function startSlideshow() {
-  drawSlide();
-  slideTimer = setInterval(() => {
-    currentSlide = (currentSlide + 1) % slideImgs.length;
-    drawSlide();
-  }, SLIDE_INTERVAL);
+function drawTiled() {
+  /* 오프스크린(타일 1장)을 3×3으로 타일링 */
+  ctx.clearRect(0, 0, CW, CH);
+  for (let row = 0; row < 3; row++) {
+    for (let col = 0; col < 3; col++) {
+      ctx.drawImage(offscreen, col * TILE_W, row * TILE_H);
+    }
+  }
 }
 
-/* 이미지 프리로드 */
-SLIDE_SRCS.forEach(src => {
+/* 슬라이드쇼 루프 — requestAnimationFrame 기반
+   매 프레임 그리지 않고 SLIDE_INTERVAL ms마다만 갱신 → 렉 감소 */
+let slideRaf = null;
+function slideshowLoop(now) {
+  slideRaf = requestAnimationFrame(slideshowLoop);
+  if (now - lastDrawTime < SLIDE_INTERVAL) return;
+  lastDrawTime = now;
+  currentSlide = (currentSlide + 1) % slideImgs.length;
+  compositeSlide();
+  drawTiled();
+}
+
+function tryStart() {
+  if (!maskReady || !slidesReady) return;
+  compositeSlide();
+  drawTiled();
+  slideRaf = requestAnimationFrame(slideshowLoop);
+}
+
+/* 마스크 로드 */
+maskImg.onload = () => { maskReady = true; tryStart(); };
+
+/* 슬라이드 이미지 프리로드 */
+for (let i = 1; i <= SLIDE_COUNT; i++) {
   const img = new Image();
-  img.onload = () => {
-    slidesLoaded++;
-    if (slidesLoaded === SLIDE_SRCS.length) startSlideshow();
-  };
-  img.onerror = () => { slidesLoaded++; };
+  const src = `images/slides/${String(i).padStart(3, '0')}.jpg`;
+  img.onload  = () => { loadedCount++; if (loadedCount >= SLIDE_COUNT * 0.8) { slidesReady = true; tryStart(); } };
+  img.onerror = () => { loadedCount++; if (loadedCount >= SLIDE_COUNT * 0.8) { slidesReady = true; tryStart(); } };
   img.src = src;
   slideImgs.push(img);
-});
-
-/* 마스크 로드 완료 후 + 이미지 없어도 플레이스홀더로 시작 */
-maskImg.onload = () => {
-  if (!slideTimer) {
-    drawSlide();
-    slideTimer = setInterval(() => {
-      currentSlide = (currentSlide + 1) % Math.max(slideImgs.length, 1);
-      drawSlide();
-    }, SLIDE_INTERVAL);
-  }
-};
+}
 
 /* =====================================================
    3. 패럴랙스 스크롤
-   배경 0.3x / 슬라이드 0.6x / 전경 1.0x
    ===================================================== */
 const SPEED = { bg: 0.3, slide: 0.6, fg: 1.0 };
 
 let scrollX = 0, scrollY = 0;
 let velX = 0, velY = 0;
-let rafId = null;
+let scrollRaf = null;
 let hintHidden = false;
+let needsRender = false;
+
+function wrapBg(val, size) {
+  /* 무한 루프: 타일 1장 크기 넘으면 snap */
+  if (val > 0)      return val - size;
+  if (val < -size)  return val + size;
+  return val;
+}
 
 function applyParallax() {
-  /* 배경 무한 루프 */
-  let bgX = scrollX * SPEED.bg;
-  let bgY = scrollY * SPEED.bg;
-  if (bgX > 0)       bgX -= TILE_W;
-  if (bgX < -TILE_W) bgX += TILE_W;
-  if (bgY > 0)       bgY -= TILE_H;
-  if (bgY < -TILE_H) bgY += TILE_H;
+  const bgX = wrapBg(scrollX * SPEED.bg, TILE_W);
+  const bgY = wrapBg(scrollY * SPEED.bg, TILE_H);
+
+  /* 슬라이드쇼도 배경처럼 무한 루프 */
+  const slX = wrapBg(scrollX * SPEED.slide, TILE_W);
+  const slY = wrapBg(scrollY * SPEED.slide, TILE_H);
+
   layerBg.style.transform    = `translate(${bgX}px, ${bgY}px)`;
-
-  /* 슬라이드쇼 레이어 */
-  layerSlide.style.transform =
-    `translate(${scrollX * SPEED.slide}px, ${scrollY * SPEED.slide}px)`;
-
-  /* 전경 */
-  layerFg.style.transform    =
-    `translate(${scrollX * SPEED.fg}px, ${scrollY * SPEED.fg}px)`;
+  layerSlide.style.transform = `translate(${slX}px, ${slY}px)`;
+  layerFg.style.transform    = `translate(${scrollX * SPEED.fg}px, ${scrollY * SPEED.fg}px)`;
 }
 
 function inertia() {
@@ -159,7 +166,7 @@ function inertia() {
   velX *= 0.92; velY *= 0.92;
   scrollX += velX; scrollY += velY;
   applyParallax();
-  rafId = requestAnimationFrame(inertia);
+  scrollRaf = requestAnimationFrame(inertia);
 }
 
 function hideHint() {
@@ -169,7 +176,7 @@ function hideHint() {
 const SCROLL_SPEED = 1.2;
 window.addEventListener('wheel', e => {
   e.preventDefault();
-  cancelAnimationFrame(rafId);
+  cancelAnimationFrame(scrollRaf);
   let dx = e.deltaX, dy = e.deltaY;
   if (e.deltaMode === 1) { dx *= 20;  dy *= 20;  }
   if (e.deltaMode === 2) { dx *= 400; dy *= 400; }
@@ -181,7 +188,7 @@ window.addEventListener('wheel', e => {
   scrollX += velX; scrollY += velY;
   applyParallax();
   hideHint();
-  rafId = requestAnimationFrame(inertia);
+  scrollRaf = requestAnimationFrame(inertia);
 }, { passive: false });
 
 let touchPrevX = 0, touchPrevY = 0;
@@ -189,10 +196,9 @@ document.addEventListener('touchstart', e => {
   touchPrevX = e.touches[0].clientX;
   touchPrevY = e.touches[0].clientY;
   velX = velY = 0;
-  cancelAnimationFrame(rafId);
+  cancelAnimationFrame(scrollRaf);
   hideHint();
 }, { passive: true });
-
 document.addEventListener('touchmove', e => {
   e.preventDefault();
   const cx = e.touches[0].clientX, cy = e.touches[0].clientY;
@@ -201,9 +207,8 @@ document.addEventListener('touchmove', e => {
   scrollX += velX; scrollY += velY;
   applyParallax();
 }, { passive: false });
-
 document.addEventListener('touchend', () => {
-  rafId = requestAnimationFrame(inertia);
+  scrollRaf = requestAnimationFrame(inertia);
 });
 
 /* =====================================================
@@ -228,7 +233,6 @@ document.querySelectorAll('.photo-item').forEach(el => {
     e.stopPropagation();
   });
 });
-
 popupClose.addEventListener('click', () => { popup.style.display = 'none'; });
 document.addEventListener('click', e => {
   if (!e.target.closest('#popup') && !e.target.closest('.photo-item'))
