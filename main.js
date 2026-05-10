@@ -1,22 +1,21 @@
 /* =====================================================
-   main.js — 패럴랙스 3레이어 + 슬라이드쇼 마스크
+   main.js
    ===================================================== */
 
 /* ── 요소 참조 ── */
-const viewport   = document.getElementById('viewport');
 const layerBg    = document.getElementById('layer-bg');
 const layerSlide = document.getElementById('layer-slideshow');
 const layerFg    = document.getElementById('layer-fg');
 const hint       = document.getElementById('ui-hint');
 
 /* =====================================================
-   1. 배경 타일 세팅 (무한 루프 3×3)
+   1. 배경 타일 (무한 루프 3×3)
    ===================================================== */
 const IMG_W  = 4000;
 const IMG_H  = 2500;
 const SCALE  = 1.2;
-const TILE_W = IMG_W * SCALE;   /* 4800px */
-const TILE_H = IMG_H * SCALE;   /* 3000px */
+const TILE_W = IMG_W * SCALE;
+const TILE_H = IMG_H * SCALE;
 
 layerBg.style.width  = TILE_W * 3 + 'px';
 layerBg.style.height = TILE_H * 3 + 'px';
@@ -30,66 +29,67 @@ document.querySelectorAll('.tile').forEach((tile, i) => {
 });
 
 /* =====================================================
-   2. 슬라이드쇼 세팅
+   2. 슬라이드쇼 — 빨간 마스크 안에만 표시
+   Canvas 2개를 사용:
+     maskCanvas: 요소1_mask.png 를 그려서 마스크로 사용
+     slideCanvas: 슬라이드 이미지를 그린 뒤
+                  destination-in 으로 마스크 모양만 남김
    ===================================================== */
-const canvas = document.getElementById('slideshow-canvas');
-const ctx    = canvas.getContext('2d');
-const wrap   = document.getElementById('slideshow-wrap');
+const slideCanvas = document.getElementById('slideshow-canvas');
+const slideCtx    = slideCanvas.getContext('2d');
+const wrap        = document.getElementById('slideshow-wrap');
 
-/* 슬라이드쇼 크기 = 배경 이미지와 동일 */
-const SW = IMG_W * SCALE;
-const SH = IMG_H * SCALE;
-canvas.width  = SW;
-canvas.height = SH;
-wrap.style.width  = SW + 'px';
-wrap.style.height = SH + 'px';
+const SW = TILE_W;
+const SH = TILE_H;
+slideCanvas.width  = SW;
+slideCanvas.height = SH;
+wrap.style.width   = SW + 'px';
+wrap.style.height  = SH + 'px';
+
+/* 마스크 이미지 로드 */
+const maskImg = new Image();
+maskImg.src = 'images/요소1_mask.png';
 
 /*
-  ★ 슬라이드쇼 이미지 경로 목록
-  실제 이미지 파일 50장으로 교체하세요
-  예) 'images/slides/001.jpg', 'images/slides/002.jpg', ...
+  슬라이드 이미지 경로
+  images/slides/001.jpg ~ 050.jpg
+  ★ 실제 파일로 교체하세요
 */
 const SLIDE_SRCS = Array.from({ length: 50 }, (_, i) =>
   `images/slides/${String(i + 1).padStart(3, '0')}.jpg`
 );
+const SLIDE_INTERVAL = 120; /* ms — 낮출수록 빠름 */
 
-/*
-  ★ 전환 속도 (ms)
-  낮출수록 빠름 — 80~200 권장
-*/
-const SLIDE_INTERVAL = 120;
-
-const slideImgs = [];
+const slideImgs  = [];
 let slidesLoaded = 0;
 let currentSlide = 0;
 let slideTimer   = null;
 
-/* 이미지 프리로드 */
-SLIDE_SRCS.forEach((src, i) => {
-  const img = new Image();
-  img.onload = () => {
-    slidesLoaded++;
-    if (slidesLoaded === SLIDE_SRCS.length) startSlideshow();
-  };
-  img.onerror = () => { slidesLoaded++; }; /* 없는 파일은 건너뜀 */
-  img.src = src;
-  slideImgs.push(img);
-});
-
 function drawSlide() {
-  ctx.clearRect(0, 0, SW, SH);
+  slideCtx.clearRect(0, 0, SW, SH);
+
+  /* ① 슬라이드 이미지 그리기 */
   const img = slideImgs[currentSlide];
   if (img && img.complete && img.naturalWidth) {
-    /* cover 방식으로 캔버스 꽉 채우기 */
     const iw = img.naturalWidth, ih = img.naturalHeight;
-    const scale = Math.max(SW / iw, SH / ih);
-    const dw = iw * scale, dh = ih * scale;
-    const dx = (SW - dw) / 2, dy = (SH - dh) / 2;
-    ctx.drawImage(img, dx, dy, dw, dh);
+    const sc = Math.max(SW / iw, SH / ih);
+    const dw = iw * sc, dh = ih * sc;
+    slideCtx.drawImage(img, (SW - dw) / 2, (SH - dh) / 2, dw, dh);
   } else {
-    /* 이미지 없을 때 — 진한 회색 채우기 (플레이스홀더) */
-    ctx.fillStyle = `hsl(${currentSlide * 7}, 20%, 30%)`;
-    ctx.fillRect(0, 0, SW, SH);
+    /* 플레이스홀더: 슬라이드별 다른 색 */
+    slideCtx.fillStyle = `hsl(${currentSlide * 7}, 40%, 40%)`;
+    slideCtx.fillRect(0, 0, SW, SH);
+  }
+
+  /*
+    ② destination-in 합성:
+    "이미 그려진 내용" × "새로 그리는 알파"
+    → 마스크 PNG의 불투명한 픽셀(빨간/선)만 남고 나머지는 투명
+  */
+  if (maskImg.complete && maskImg.naturalWidth) {
+    slideCtx.globalCompositeOperation = 'destination-in';
+    slideCtx.drawImage(maskImg, 0, 0, SW, SH);
+    slideCtx.globalCompositeOperation = 'source-over'; /* 원상복구 */
   }
 }
 
@@ -101,27 +101,33 @@ function startSlideshow() {
   }, SLIDE_INTERVAL);
 }
 
-/* 이미지가 없어도 플레이스홀더로 미리 시작 */
-setTimeout(() => {
+/* 이미지 프리로드 */
+SLIDE_SRCS.forEach(src => {
+  const img = new Image();
+  img.onload = () => {
+    slidesLoaded++;
+    if (slidesLoaded === SLIDE_SRCS.length) startSlideshow();
+  };
+  img.onerror = () => { slidesLoaded++; };
+  img.src = src;
+  slideImgs.push(img);
+});
+
+/* 마스크 로드 완료 후 + 이미지 없어도 플레이스홀더로 시작 */
+maskImg.onload = () => {
   if (!slideTimer) {
+    drawSlide();
     slideTimer = setInterval(() => {
       currentSlide = (currentSlide + 1) % Math.max(slideImgs.length, 1);
       drawSlide();
     }, SLIDE_INTERVAL);
-    drawSlide();
   }
-}, 300);
+};
 
 /* =====================================================
    3. 패럴랙스 스크롤
+   배경 0.3x / 슬라이드 0.6x / 전경 1.0x
    ===================================================== */
-
-/*
-  속도 배율:
-  BG   0.3  → 가장 느림  (가장 멀리 있는 느낌)
-  SLIDE 0.6 → 중간
-  FG   1.0  → 화면과 1:1 (가장 앞)
-*/
 const SPEED = { bg: 0.3, slide: 0.6, fg: 1.0 };
 
 let scrollX = 0, scrollY = 0;
@@ -130,21 +136,21 @@ let rafId = null;
 let hintHidden = false;
 
 function applyParallax() {
-  /* 배경: 무한 루프 wrap */
+  /* 배경 무한 루프 */
   let bgX = scrollX * SPEED.bg;
   let bgY = scrollY * SPEED.bg;
   if (bgX > 0)       bgX -= TILE_W;
   if (bgX < -TILE_W) bgX += TILE_W;
   if (bgY > 0)       bgY -= TILE_H;
   if (bgY < -TILE_H) bgY += TILE_H;
-  layerBg.style.transform = `translate(${bgX}px, ${bgY}px)`;
+  layerBg.style.transform    = `translate(${bgX}px, ${bgY}px)`;
 
   /* 슬라이드쇼 레이어 */
   layerSlide.style.transform =
     `translate(${scrollX * SPEED.slide}px, ${scrollY * SPEED.slide}px)`;
 
   /* 전경 */
-  layerFg.style.transform =
+  layerFg.style.transform    =
     `translate(${scrollX * SPEED.fg}px, ${scrollY * SPEED.fg}px)`;
 }
 
@@ -160,29 +166,24 @@ function hideHint() {
   if (!hintHidden) { hint.classList.add('hidden'); hintHidden = true; }
 }
 
-/* 휠 스크롤 */
 const SCROLL_SPEED = 1.2;
 window.addEventListener('wheel', e => {
   e.preventDefault();
   cancelAnimationFrame(rafId);
-
   let dx = e.deltaX, dy = e.deltaY;
   if (e.deltaMode === 1) { dx *= 20;  dy *= 20;  }
   if (e.deltaMode === 2) { dx *= 400; dy *= 400; }
-
   velX -= dx * SCROLL_SPEED;
   velY -= dy * SCROLL_SPEED;
   const MAX = 60;
   velX = Math.max(-MAX, Math.min(MAX, velX));
   velY = Math.max(-MAX, Math.min(MAX, velY));
-
   scrollX += velX; scrollY += velY;
   applyParallax();
   hideHint();
   rafId = requestAnimationFrame(inertia);
 }, { passive: false });
 
-/* 터치 스크롤 */
 let touchPrevX = 0, touchPrevY = 0;
 document.addEventListener('touchstart', e => {
   touchPrevX = e.touches[0].clientX;
@@ -194,10 +195,8 @@ document.addEventListener('touchstart', e => {
 
 document.addEventListener('touchmove', e => {
   e.preventDefault();
-  const cx = e.touches[0].clientX;
-  const cy = e.touches[0].clientY;
-  velX = cx - touchPrevX;
-  velY = cy - touchPrevY;
+  const cx = e.touches[0].clientX, cy = e.touches[0].clientY;
+  velX = cx - touchPrevX; velY = cy - touchPrevY;
   touchPrevX = cx; touchPrevY = cy;
   scrollX += velX; scrollY += velY;
   applyParallax();
@@ -208,7 +207,7 @@ document.addEventListener('touchend', () => {
 });
 
 /* =====================================================
-   4. 전경 사진 팝업
+   4. 전경 팝업
    ===================================================== */
 const popup      = document.getElementById('popup');
 const popupClose = document.getElementById('popup-close');
@@ -220,12 +219,11 @@ document.querySelectorAll('.photo-item').forEach(el => {
     popupTitle.textContent = el.dataset.title;
     popupDesc.textContent  = el.dataset.desc;
     const rect = el.getBoundingClientRect();
-    let left = rect.right + 12;
-    let top  = rect.top;
+    let left = rect.right + 12, top = rect.top;
     if (left + 280 > window.innerWidth)  left = rect.left - 272;
     if (top  + 140 > window.innerHeight) top  = window.innerHeight - 150;
-    popup.style.left    = left + 'px';
-    popup.style.top     = top  + 'px';
+    popup.style.left = left + 'px';
+    popup.style.top  = top  + 'px';
     popup.style.display = 'block';
     e.stopPropagation();
   });
@@ -237,5 +235,4 @@ document.addEventListener('click', e => {
     popup.style.display = 'none';
 });
 
-/* ── 초기 렌더링 ── */
 applyParallax();
