@@ -8,32 +8,90 @@
 </head>
 <body>
 
-  <div id="ui-hint">scroll to explore</div>
+  <div id="ui-hint">drag tiles to reveal</div>
   <div id="ui-coords">0 / 0</div>
 
-  <!-- ① 시야 제한 창 -->
+  <!-- 전체 뷰포트 -->
   <div id="viewport">
 
-    <!-- ② 무한 루프 배경 캔버스 -->
-    <div id="canvas">
-      <!--
-        3×3 타일 배치
-        left = 열번호 × 33.333%
-        top  = 행번호 × 33.333%
-      -->
-      <div class="tile" style="left:0%;       top:0%"></div>
-      <div class="tile" style="left:33.3334%; top:0%"></div>
-      <div class="tile" style="left:66.6667%; top:0%"></div>
+    <!-- 월드: 스크롤로 움직이는 전체 공간 -->
+    <div id="world">
 
-      <div class="tile" style="left:0%;       top:33.3334%"></div>
-      <div class="tile" style="left:33.3334%; top:33.3334%"></div>
-      <div class="tile" style="left:66.6667%; top:33.3334%"></div>
+      <!-- 레이어 1 (아래): 드러날 사진들이 배치되는 공간 -->
+      <div id="layer-photos">
+        <!--
+          사진 준비되면 아래 형식으로 추가:
+          <div class="photo-item"
+               style="left:Xpx; top:Ypx; width:Wpx; height:Hpx;"
+               data-title="작품 제목"
+               data-desc="작품 설명">
+            <img src="images/fg/파일명.png" draggable="false" />
+          </div>
+        -->
 
-      <div class="tile" style="left:0%;       top:66.6667%"></div>
-      <div class="tile" style="left:33.3334%; top:66.6667%"></div>
-      <div class="tile" style="left:66.6667%; top:66.6667%"></div>
+        <!-- 플레이스홀더 45개 — 실제 사진으로 교체 예정 -->
+        <div class="photo-item" style="left:120px;  top:80px;   width:280px; height:200px;" data-title="작품 1"  data-desc="설명을 입력하세요."><div class="ph"></div></div>
+        <div class="photo-item" style="left:460px;  top:40px;   width:200px; height:260px;" data-title="작품 2"  data-desc="설명을 입력하세요."><div class="ph"></div></div>
+        <div class="photo-item" style="left:720px;  top:120px;  width:320px; height:220px;" data-title="작품 3"  data-desc="설명을 입력하세요."><div class="ph"></div></div>
+        <div class="photo-item" style="left:1100px; top:60px;   width:240px; height:300px;" data-title="작품 4"  data-desc="설명을 입력하세요."><div class="ph"></div></div>
+        <div class="photo-item" style="left:1400px; top:100px;  width:300px; height:200px;" data-title="작품 5"  data-desc="설명을 입력하세요."><div class="ph"></div></div>
+        <div class="photo-item" style="left:1760px; top:50px;   width:220px; height:280px;" data-title="작품 6"  data-desc="설명을 입력하세요."><div class="ph"></div></div>
+        <div class="photo-item" style="left:2040px; top:90px;   width:260px; height:200px;" data-title="작품 7"  data-desc="설명을 입력하세요."><div class="ph"></div></div>
+        <div class="photo-item" style="left:2360px; top:40px;   width:300px; height:240px;" data-title="작품 8"  data-desc="설명을 입력하세요."><div class="ph"></div></div>
+        <div class="photo-item" style="left:2720px; top:80px;   width:240px; height:300px;" data-title="작품 9"  data-desc="설명을 입력하세요."><div class="ph"></div></div>
+        <div class="photo-item" style="left:3020px; top:50px;   width:280px; height:200px;" data-title="작품 10" data-desc="설명을 입력하세요."><div class="ph"></div></div>
+
+        <div class="photo-item" style="left:80px;   top:360px;  width:260px; height:300px;" data-title="작품 11" data-desc="설명을 입력하세요."><div class="ph"></div></div>
+        <div class="photo-item" style="left:400px;  top:380px;  width:320px; height:220px;" data-title="작품 12" data-desc="설명을 입력하세요."><div class="ph"></div></div>
+        <div class="photo-item" style="left:780px;  top:420px;  width:200px; height:280px;" data-title="작품 13" data-desc="설명을 입력하세요."><div class="ph"></div></div>
+        <div class="photo-item" style="left:1040px; top:360px;  width:300px; height:240px;" data-title="작품 14" data-desc="설명을 입력하세요."><div class="ph"></div></div>
+        <div class="photo-item" style="left:1400px; top:400px;  width:240px; height:300px;" data-title="작품 15" data-desc="설명을 입력하세요."><div class="ph"></div></div>
+        <div class="photo-item" style="left:1700px; top:360px;  width:280px; height:220px;" data-title="작품 16" data-desc="설명을 입력하세요."><div class="ph"></div></div>
+        <div class="photo-item" style="left:2040px; top:380px;  width:220px; height:300px;" data-title="작품 17" data-desc="설명을 입력하세요."><div class="ph"></div></div>
+        <div class="photo-item" style="left:2320px; top:340px;  width:300px; height:260px;" data-title="작품 18" data-desc="설명을 입력하세요."><div class="ph"></div></div>
+        <div class="photo-item" style="left:2680px; top:400px;  width:260px; height:200px;" data-title="작품 19" data-desc="설명을 입력하세요."><div class="ph"></div></div>
+        <div class="photo-item" style="left:3000px; top:360px;  width:300px; height:280px;" data-title="작품 20" data-desc="설명을 입력하세요."><div class="ph"></div></div>
+
+        <div class="photo-item" style="left:100px;  top:740px;  width:300px; height:220px;" data-title="작품 21" data-desc="설명을 입력하세요."><div class="ph"></div></div>
+        <div class="photo-item" style="left:460px;  top:700px;  width:240px; height:300px;" data-title="작품 22" data-desc="설명을 입력하세요."><div class="ph"></div></div>
+        <div class="photo-item" style="left:760px;  top:760px;  width:280px; height:200px;" data-title="작품 23" data-desc="설명을 입력하세요."><div class="ph"></div></div>
+        <div class="photo-item" style="left:1100px; top:720px;  width:200px; height:280px;" data-title="작품 24" data-desc="설명을 입력하세요."><div class="ph"></div></div>
+        <div class="photo-item" style="left:1360px; top:740px;  width:320px; height:240px;" data-title="작품 25" data-desc="설명을 입력하세요."><div class="ph"></div></div>
+        <div class="photo-item" style="left:1740px; top:700px;  width:260px; height:300px;" data-title="작품 26" data-desc="설명을 입력하세요."><div class="ph"></div></div>
+        <div class="photo-item" style="left:2060px; top:760px;  width:300px; height:200px;" data-title="작품 27" data-desc="설명을 입력하세요."><div class="ph"></div></div>
+        <div class="photo-item" style="left:2420px; top:720px;  width:220px; height:280px;" data-title="작품 28" data-desc="설명을 입력하세요."><div class="ph"></div></div>
+        <div class="photo-item" style="left:2700px; top:740px;  width:280px; height:260px;" data-title="작품 29" data-desc="설명을 입력하세요."><div class="ph"></div></div>
+        <div class="photo-item" style="left:3040px; top:700px;  width:240px; height:300px;" data-title="작품 30" data-desc="설명을 입력하세요."><div class="ph"></div></div>
+
+        <div class="photo-item" style="left:80px;   top:1060px; width:260px; height:280px;" data-title="작품 31" data-desc="설명을 입력하세요."><div class="ph"></div></div>
+        <div class="photo-item" style="left:400px;  top:1080px; width:300px; height:200px;" data-title="작품 32" data-desc="설명을 입력하세요."><div class="ph"></div></div>
+        <div class="photo-item" style="left:760px;  top:1040px; width:220px; height:300px;" data-title="작품 33" data-desc="설명을 입력하세요."><div class="ph"></div></div>
+        <div class="photo-item" style="left:1040px; top:1080px; width:300px; height:240px;" data-title="작품 34" data-desc="설명을 입력하세요."><div class="ph"></div></div>
+        <div class="photo-item" style="left:1400px; top:1060px; width:240px; height:280px;" data-title="작품 35" data-desc="설명을 입력하세요."><div class="ph"></div></div>
+        <div class="photo-item" style="left:1700px; top:1040px; width:280px; height:220px;" data-title="작품 36" data-desc="설명을 입력하세요."><div class="ph"></div></div>
+        <div class="photo-item" style="left:2040px; top:1080px; width:200px; height:300px;" data-title="작품 37" data-desc="설명을 입력하세요."><div class="ph"></div></div>
+        <div class="photo-item" style="left:2300px; top:1060px; width:320px; height:240px;" data-title="작품 38" data-desc="설명을 입력하세요."><div class="ph"></div></div>
+        <div class="photo-item" style="left:2680px; top:1040px; width:260px; height:300px;" data-title="작품 39" data-desc="설명을 입력하세요."><div class="ph"></div></div>
+        <div class="photo-item" style="left:3000px; top:1080px; width:300px; height:220px;" data-title="작품 40" data-desc="설명을 입력하세요."><div class="ph"></div></div>
+
+        <div class="photo-item" style="left:200px;  top:1400px; width:280px; height:260px;" data-title="작품 41" data-desc="설명을 입력하세요."><div class="ph"></div></div>
+        <div class="photo-item" style="left:560px;  top:1380px; width:220px; height:300px;" data-title="작품 42" data-desc="설명을 입력하세요."><div class="ph"></div></div>
+        <div class="photo-item" style="left:860px;  top:1420px; width:300px; height:200px;" data-title="작품 43" data-desc="설명을 입력하세요."><div class="ph"></div></div>
+        <div class="photo-item" style="left:1220px; top:1380px; width:260px; height:280px;" data-title="작품 44" data-desc="설명을 입력하세요."><div class="ph"></div></div>
+        <div class="photo-item" style="left:1540px; top:1400px; width:300px; height:240px;" data-title="작품 45" data-desc="설명을 입력하세요."><div class="ph"></div></div>
+      </div>
+
+      <!-- 레이어 2 (위): Canvas로 그린 분할 타일 — 드래그해서 밀어냄 -->
+      <canvas id="tile-canvas"></canvas>
+
     </div>
+  </div>
 
+  <!-- 팝업 -->
+  <div id="popup">
+    <button id="popup-close">×</button>
+    <p id="popup-title"></p>
+    <p id="popup-desc"></p>
   </div>
 
   <script src="main.js"></script>
