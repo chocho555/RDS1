@@ -6,14 +6,13 @@ const layerBg  = document.getElementById('layer-bg');
 const layerMid = document.getElementById('layer-mid');
 const hint     = document.getElementById('ui-hint');
 
-/* ── 타일 크기 ── */
 const IMG_W  = 4000;
 const IMG_H  = 2500;
 const SCALE  = 1.2;
 const TILE_W = IMG_W * SCALE;  /* 4800px */
 const TILE_H = IMG_H * SCALE;  /* 3000px */
 
-/* 배경 타일 세팅 */
+/* ── 배경 타일 (3×3) ── */
 layerBg.style.width  = TILE_W * 3 + 'px';
 layerBg.style.height = TILE_H * 3 + 'px';
 document.querySelectorAll('.tile').forEach((tile, i) => {
@@ -24,11 +23,79 @@ document.querySelectorAll('.tile').forEach((tile, i) => {
   tile.style.top    = row * TILE_H + 'px';
 });
 
-/* 중경 레이어 크기 = 타일 1장 */
-layerMid.style.width  = TILE_W + 'px';
-layerMid.style.height = TILE_H + 'px';
+/* ── 조각 데이터 ── */
+const PIECES = [
+  {id:1,  x:103,  y:2066, w:438,  h:654},
+  {id:2,  x:2149, y:317,  w:816,  h:545},
+  {id:3,  x:582,  y:203,  w:336,  h:228},
+  {id:4,  x:1843, y:2170, w:487,  h:730},
+  {id:5,  x:3716, y:428,  w:348,  h:521},
+  {id:6,  x:2891, y:2561, w:482,  h:323},
+  {id:7,  x:3371, y:2562, w:302,  h:437},
+  {id:8,  x:4147, y:1008, w:460,  h:306},
+  {id:9,  x:0,    y:0,    w:209,  h:306},
+  {id:10, x:3232, y:2137, w:457,  h:306},
+  {id:11, x:434,  y:1008, w:661,  h:985},
+  {id:12, x:2110, y:1884, w:443,  h:293},
+  {id:13, x:1949, y:990,  w:383,  h:257},
+  {id:14, x:960,  y:2249, w:292,  h:197},
+  {id:15, x:2813, y:2642, w:338,  h:226},
+  {id:16, x:1661, y:1238, w:444,  h:296},
+  {id:17, x:0,    y:821,  w:440,  h:293},
+  {id:18, x:1501, y:26,   w:650,  h:432},
+  {id:19, x:749,  y:426,  w:382,  h:254},
+  {id:20, x:4108, y:2170, w:277,  h:181},
+  {id:21, x:1252, y:1883, w:322,  h:481},
+  {id:22, x:3811, y:2352, w:469,  h:308},
+  {id:23, x:4460, y:26,   w:338,  h:395},
+  {id:24, x:4312, y:420,  w:350,  h:230},
+  {id:25, x:749,  y:2759, w:220,  h:149},
+  {id:26, x:749,  y:2525, w:356,  h:239},
+  {id:27, x:3594, y:2659, w:433,  h:290},
+  {id:28, x:538,  y:2267, w:218,  h:318},
+  {id:29, x:462,  y:614,  w:286,  h:187},
+  {id:30, x:2611, y:2448, w:287,  h:194},
+  {id:31, x:3203, y:0,    w:514,  h:768},
+  {id:32, x:3841, y:1238, w:265,  h:401},
+  {id:33, x:4312, y:1556, w:487,  h:331},
+  {id:34, x:3595, y:1841, w:444,  h:298},
+  {id:35, x:2615, y:1115, w:1103, h:734},
+];
 
-/* ── 패럴랙스 속도 ── */
+/* ── 중경 레이어: 3×3 복제로 무한 루프 ── */
+layerMid.style.width  = TILE_W * 3 + 'px';
+layerMid.style.height = TILE_H * 3 + 'px';
+
+for (let row = 0; row < 3; row++) {
+  for (let col = 0; col < 3; col++) {
+    const offsetX = col * TILE_W;
+    const offsetY = row * TILE_H;
+
+    PIECES.forEach(p => {
+      const el = document.createElement('div');
+      el.className = 'piece';
+      el.style.left   = (offsetX + p.x) + 'px';
+      el.style.top    = (offsetY + p.y) + 'px';
+      el.style.width  = p.w + 'px';
+      el.style.height = p.h + 'px';
+      el.dataset.title = `조각 ${p.id}`;
+      el.dataset.desc  = '설명을 입력하세요.';
+
+      const img = document.createElement('img');
+      img.src = `images/조각/조각${p.id}.png`;
+      img.style.width      = TILE_W + 'px';
+      img.style.height     = TILE_H + 'px';
+      img.style.marginLeft = -p.x + 'px';
+      img.style.marginTop  = -p.y + 'px';
+      img.draggable = false;
+
+      el.appendChild(img);
+      layerMid.appendChild(el);
+    });
+  }
+}
+
+/* ── 패럴랙스 ── */
 const SPEED_BG  = 0.2;
 const SPEED_MID = 0.6;
 
@@ -37,27 +104,13 @@ let velX = 0, velY = 0;
 let rafId = null;
 let hintHidden = false;
 
-/*
-  무한 루프: modulo로 타일 1장 범위 안에서 순환
-  배경(3×3 타일)과 중경(1장, 반복) 모두 같은 방식으로 wrap
-*/
 function wrap(val, size) {
   return ((val % size) + size) % size - size;
 }
 
 function applyParallax() {
-  /* 배경: 3×3 타일 무한 루프 */
-  const bgX = wrap(x * SPEED_BG,  TILE_W);
-  const bgY = wrap(y * SPEED_BG,  TILE_H);
-  layerBg.style.transform = `translate(${bgX}px, ${bgY}px)`;
-
-  /*
-    중경: 조각들이 배치된 레이어
-    패럴랙스 속도로 움직이되, 타일 크기만큼 wrap해서 무한 반복
-  */
-  const midX = wrap(x * SPEED_MID, TILE_W);
-  const midY = wrap(y * SPEED_MID, TILE_H);
-  layerMid.style.transform = `translate(${midX}px, ${midY}px)`;
+  layerBg.style.transform  = `translate(${wrap(x * SPEED_BG,  TILE_W)}px, ${wrap(y * SPEED_BG,  TILE_H)}px)`;
+  layerMid.style.transform = `translate(${wrap(x * SPEED_MID, TILE_W)}px, ${wrap(y * SPEED_MID, TILE_H)}px)`;
 }
 
 function inertia() {
@@ -111,32 +164,41 @@ document.addEventListener('touchend', () => {
 
 applyParallax();
 
-/* ── 조각 클릭 팝업 ── */
+/* ── 팝업 시스템 ── */
 const popup      = document.getElementById('popup');
-const popupClose = document.getElementById('popup-close');
 const popupTitle = document.getElementById('popup-title');
 const popupDesc  = document.getElementById('popup-desc');
+let popupTimer   = null;
 
-document.querySelectorAll('.piece').forEach(el => {
-  el.addEventListener('click', e => {
-    popupTitle.textContent = el.dataset.title;
-    popupDesc.textContent  = el.dataset.desc;
-    const rect = el.getBoundingClientRect();
-    let left = rect.right + 12, top = rect.top;
-    if (left + 280 > window.innerWidth)  left = rect.left - 272;
-    if (top  + 140 > window.innerHeight) top  = window.innerHeight - 150;
-    if (left < 0) left = 8;
+document.addEventListener('click', e => {
+  const piece = e.target.closest('.piece');
+  if (piece) {
+    popupTitle.textContent = piece.dataset.title;
+    popupDesc.textContent  = piece.dataset.desc;
+
+    const rect = piece.getBoundingClientRect();
+    let left = rect.right + 12;
+    let top  = rect.top;
+    if (left + 270 > window.innerWidth)  left = rect.left - 272;
+    if (top  + 120 > window.innerHeight) top  = window.innerHeight - 130;
+    if (left < 8) left = 8;
+    if (top  < 8) top  = 8;
+
     popup.style.left    = left + 'px';
     popup.style.top     = top  + 'px';
     popup.style.display = 'block';
-    e.stopPropagation();
-  });
-});
 
-popupClose.addEventListener('click', () => { popup.style.display = 'none'; });
-document.addEventListener('click', e => {
-  if (!e.target.closest('#popup') && !e.target.closest('.piece'))
+    /* 30초 후 자동 사라짐 */
+    clearTimeout(popupTimer);
+    popupTimer = setTimeout(() => {
+      popup.style.display = 'none';
+    }, 30000);
+
+    e.stopPropagation();
+  } else {
     popup.style.display = 'none';
+    clearTimeout(popupTimer);
+  }
 });
 
 /* ── 판 시스템 ── */
