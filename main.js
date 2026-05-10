@@ -43,10 +43,9 @@ let velX = 0, velY = 0;
 let rafId = null;
 let hintHidden = false;
 
+/* modulo 방식: 어느 방향으로 얼마나 가도 타일 범위 안으로 */
 function wrap(val, size) {
-  if (val > 0)      return val - size;
-  if (val < -size)  return val + size;
-  return val;
+  return ((val % size) + size) % size - size;
 }
 
 function applyParallax() {
