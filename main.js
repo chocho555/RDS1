@@ -55,8 +55,8 @@ window.addEventListener('wheel', e => {
   let dx = e.deltaX, dy = e.deltaY;
   if (e.deltaMode === 1) { dx *= 20;  dy *= 20;  }
   if (e.deltaMode === 2) { dx *= 400; dy *= 400; }
-  velX -= dx * 1.2; velY -= dy * 1.2;
-  const MAX = 60;
+  velX -= dx * 0.5; velY -= dy * 0.5;
+  const MAX = 30;
   velX = Math.max(-MAX, Math.min(MAX, velX));
   velY = Math.max(-MAX, Math.min(MAX, velY));
   x += velX; y += velY;
