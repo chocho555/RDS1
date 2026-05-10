@@ -50,7 +50,7 @@ body {
   height: 100vh;
   z-index: 999;
   pointer-events: none;
-  background-size: contain;
+  background-size: 100% 100%;
   background-position: center;
   background-repeat: no-repeat;
 }
