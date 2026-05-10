@@ -1,87 +1,107 @@
 /* =====================================================
    style.css
    ===================================================== */
-
-*, *::before, *::after {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  background: #f0ede8;
-  
+  background: #f5f3f0;
   font-family: 'Courier New', monospace;
 }
 
-body {
-  cursor: grabbing;
-}
-
-/* ── 뷰포트: 화면 전체를 꽉 채움 ───────────────────
-   indirect.flights처럼 테두리 없이 전체화면
-─────────────────────────────────────────────────── */
+/* ── 뷰포트: 화면 전체 ── */
 #viewport {
   position: absolute;
-  inset: 0;                  /* top/right/bottom/left 전부 0 */
+  inset: 0;
   overflow: hidden;
-  /* 테두리 없음 */
 }
 
-/* ── 캔버스: 이미지를 크게 깔아두는 컨테이너 ───────
-   3×3 타일 격자 전체를 담음
-   각 타일이 화면보다 훨씬 크기 때문에
-   드래그해야 전체를 탐색할 수 있음
-─────────────────────────────────────────────────── */
-#canvas {
+/* ── 월드: 스크롤로 움직이는 전체 공간 ── */
+#world {
   position: absolute;
-  /* 타일 3장 × 3장 크기 (JS에서 픽셀로 계산해 적용) */
+  width: 3600px;
+  height: 1800px;
   will-change: transform;
 }
 
-/* ── 개별 타일 ─────────────────────────────────────
-   이미지 원본 크기(4000×2500)의 1.5배로 확대
-   → 타일 1장이 화면보다 훨씬 커서 일부만 보임
-   JS에서 width/height를 픽셀로 직접 지정함
-─────────────────────────────────────────────────── */
-.tile {
+/* ── 레이어1: 사진들 ── */
+#layer-photos {
   position: absolute;
-  background-image: url('images/bg/사문디_배경.jpg');
-  background-size: cover;
-  background-position: center;
+  inset: 0;
 }
 
-/* ── UI: 드래그 힌트 ────────────────────────────── */
-#ui-hint {
+.photo-item {
+  position: absolute;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+.photo-item:hover { transform: scale(1.02); }
+.photo-item img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+/* 플레이스홀더 */
+.ph {
+  width: 100%; height: 100%;
+  background: #e0ddd8;
+  border: 1px dashed #bbb;
+}
+
+/* ── 레이어2: 타일 캔버스 (최상단) ── */
+#tile-canvas {
+  position: absolute;
+  top: 0; left: 0;
+  width: 3600px;
+  height: 1800px;
+  cursor: grab;
+}
+#tile-canvas.grabbing { cursor: grabbing; }
+
+/* ── 팝업 ── */
+#popup {
+  display: none;
   position: fixed;
-  bottom: 28px;
-  left: 50%;
+  z-index: 200;
+  background: #fff;
+  border: 0.5px solid #ccc;
+  padding: 18px 20px 18px 22px;
+  width: 260px;
+  animation: pop-in 0.18s ease;
+}
+@keyframes pop-in {
+  from { opacity:0; transform:translateY(6px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+#popup-close {
+  position: absolute; top:10px; right:12px;
+  background:none; border:none; cursor:pointer;
+  font-size:18px; color:#999; font-family: inherit;
+}
+#popup-close:hover { color:#111; }
+#popup-title {
+  font-size:12px; font-weight:700; letter-spacing:0.1em;
+  color:#111; margin-bottom:8px; text-transform:uppercase; padding-right:20px;
+}
+#popup-desc { font-size:12px; color:#555; line-height:1.7; }
+
+/* ── UI ── */
+#ui-hint {
+  position: fixed; bottom:28px; left:50%;
   transform: translateX(-50%);
-  z-index: 10;
-  font-size: 10px;
-  letter-spacing: 0.3em;
-  color: rgba(0, 0, 0, 0.3);
-  text-transform: uppercase;
-  pointer-events: none;
-  white-space: nowrap;
+  z-index: 100; font-size:10px; letter-spacing:0.3em;
+  color:rgba(0,0,0,0.3); text-transform:uppercase;
+  pointer-events:none; white-space:nowrap;
   transition: opacity 1s ease;
 }
-
-#ui-hint.hidden {
-  opacity: 0;
-}
-
-/* ── UI: 좌표 표시 ──────────────────────────────── */
+#ui-hint.hidden { opacity:0; }
 #ui-coords {
-  position: fixed;
-  bottom: 28px;
-  right: 28px;
-  z-index: 10;
-  font-size: 9px;
-  letter-spacing: 0.15em;
-  color: rgba(0, 0, 0, 0.2);
-  pointer-events: none;
+  position:fixed; bottom:28px; right:28px;
+  z-index:100; font-size:9px; letter-spacing:0.15em;
+  color:rgba(0,0,0,0.2); pointer-events:none;
 }
