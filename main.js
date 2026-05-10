@@ -167,35 +167,33 @@ applyParallax();
 /* ── 팝업 시스템 (다중 팝업) ── */
 document.addEventListener('click', e => {
   const piece = e.target.closest('.piece');
-  if (!piece) return;
 
-  const rect = piece.getBoundingClientRect();
-  let left = rect.right + 12;
-  let top  = rect.top;
-  if (left + 270 > window.innerWidth)  left = rect.left - 272;
-  if (top  + 120 > window.innerHeight) top  = window.innerHeight - 130;
-  if (left < 8) left = 8;
-  if (top  < 8) top  = 8;
+  if (piece) {
+    const rect = piece.getBoundingClientRect();
+    let left = rect.right + 12;
+    let top  = rect.top;
+    if (left + 270 > window.innerWidth)  left = rect.left - 272;
+    if (top  + 120 > window.innerHeight) top  = window.innerHeight - 130;
+    if (left < 8) left = 8;
+    if (top  < 8) top  = 8;
 
-  const popup = document.createElement('div');
-  popup.className = 'popup';
-  popup.innerHTML = `
-    <p class="popup-title">${piece.dataset.title}</p>
-    <p class="popup-desc">${piece.dataset.desc}</p>
-  `;
-  popup.style.left = left + 'px';
-  popup.style.top  = top  + 'px';
-  document.body.appendChild(popup);
+    const popup = document.createElement('div');
+    popup.className = 'popup';
+    popup.innerHTML = `
+      <p class="popup-title">${piece.dataset.title}</p>
+      <p class="popup-desc">${piece.dataset.desc}</p>
+    `;
+    popup.style.left = left + 'px';
+    popup.style.top  = top  + 'px';
+    document.body.appendChild(popup);
 
-  /* 30초 후 자동 제거 */
-  setTimeout(() => popup.remove(), 30000);
+    /* 30초 후 자동 제거 */
+    setTimeout(() => popup.remove(), 30000);
 
-  e.stopPropagation();
-});
-
-/* 빈 곳 클릭 시 모든 팝업 제거 */
-document.addEventListener('click', () => {
-  document.querySelectorAll('.popup').forEach(p => p.remove());
+  } else {
+    /* 빈 곳 클릭 시 모든 팝업 제거 */
+    document.querySelectorAll('.popup').forEach(p => p.remove());
+  }
 });
 
 /* ── 판 시스템 ── */
