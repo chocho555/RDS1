@@ -13,20 +13,10 @@ body {
   overflow:hidden;
 }
 
-#world {
+#canvas {
   position:absolute;
-  width:100%; height:100%;
-}
-
-/* 레이어 공통 */
-.layer {
-  position:absolute;
-  top:0; left:0;
   will-change:transform;
 }
-
-/* ── 배경 ── */
-#layer-bg { position:absolute; top:0; left:0; }
 
 .tile {
   position:absolute;
@@ -35,86 +25,10 @@ body {
   background-position:center;
 }
 
-/* ── 슬라이드쇼 레이어 ── */
-#layer-slideshow {
-  position:absolute;
-  top:0; left:0;
-  pointer-events:none;
-}
-
-#slideshow-wrap {
-  position:relative;
-}
-
-/*
-  Canvas 하나로 슬라이드 이미지 그린 뒤
-  destination-in 으로 마스크 모양(빨간/선)만 남김
-  → 배경이 비쳐야 하므로 canvas 배경은 투명 유지
-*/
-#slideshow-canvas {
-  position:absolute;
-  top:0; left:0;
-  display:block;
-  /* 캔버스 바깥은 완전 투명 — 배경이 그대로 보임 */
-}
-
-/* ── 전경 ── */
-#layer-fg {
-  position:absolute;
-  top:0; left:0;
-}
-
-.photo-item {
-  position:absolute;
-  cursor:pointer;
-  transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
-}
-.photo-item:hover { transform:scale(1.04); }
-.photo-item img {
-  width:100%; height:auto;
-  display:block;
-  -webkit-user-drag:none;
-  user-select:none;
-}
-.ph {
-  width:100%;
-  aspect-ratio:4/3;
-  background:#ddd;
-  border:1px dashed #bbb;
-}
-
-/* ── 팝업 ── */
-#popup {
-  display:none;
-  position:fixed;
-  z-index:300;
-  background:#fff;
-  border:0.5px solid #ccc;
-  padding:18px 20px 18px 22px;
-  width:260px;
-  animation:pop-in 0.18s ease;
-}
-@keyframes pop-in {
-  from { opacity:0; transform:translateY(6px); }
-  to   { opacity:1; transform:translateY(0); }
-}
-#popup-close {
-  position:absolute; top:10px; right:12px;
-  background:none; border:none; cursor:pointer;
-  font-size:18px; color:#999; font-family:inherit;
-}
-#popup-close:hover { color:#111; }
-#popup-title {
-  font-size:12px; font-weight:700; letter-spacing:0.1em;
-  color:#111; margin-bottom:8px; text-transform:uppercase; padding-right:20px;
-}
-#popup-desc { font-size:12px; color:#555; line-height:1.7; }
-
-/* ── UI ── */
 #ui-hint {
   position:fixed; bottom:28px; left:50%;
   transform:translateX(-50%);
-  z-index:200; font-size:10px; letter-spacing:0.3em;
+  z-index:100; font-size:10px; letter-spacing:0.3em;
   color:rgba(0,0,0,0.3); text-transform:uppercase;
   pointer-events:none; white-space:nowrap;
   transition:opacity 1s ease;
