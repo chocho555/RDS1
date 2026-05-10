@@ -30,18 +30,20 @@ body {
 
 #layer-mid { z-index:2; }
 
-.mid-tile {
-  position:absolute;
-  background-image:url('images/요소2.png');
-  background-size:cover;
-  background-position:center;
+/* ── 조각 요소 ── */
+.piece {
+  position: absolute;
+  cursor: pointer;
+  overflow: hidden;
+}
+.piece img {
+  display: block;
+  -webkit-user-drag: none;
+  user-select: none;
+  /* mix-blend-mode 제거 → 이미지 겹침 없앰 */
 }
 
-/* ── 판 시스템 ──────────────────────────────────
-   img 태그로 원본 그대로 표시
-   mix-blend-mode: multiply → 흰색=투명, 검정=검정
-   object-fit: fill → 화면에 꽉 차게 (픽셀 건드리지 않음)
-─────────────────────────────────────────────── */
+/* ── 판 시스템 ── */
 .panel {
   display: none;
   position: fixed;
@@ -50,19 +52,17 @@ body {
   height: 100vh;
   z-index: 999;
   pointer-events: none;
-  mix-blend-mode: multiply;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
 }
+.panel img { display: none; }
+#panel-a { background-image: url('images/가림막1.png'); }
+#panel-b { background-image: url('images/가림막2.png'); }
+#panel-c { background-image: url('images/가림막3.png'); }
+#panel-d { background-image: url('images/가림막4.png'); }
 
-.panel img {
-  width: 100%;
-  height: 100%;
-  object-fit: fill;
-  display: block;
-}
-
-#panel-a { } #panel-b { } #panel-c { } #panel-d { }
-
-/* ── UI ── */
+/* ── UI 힌트 ── */
 #ui-hint {
   position:fixed; bottom:28px; left:50%;
   transform:translateX(-50%);
@@ -73,30 +73,6 @@ body {
 }
 #ui-hint.hidden { opacity:0; }
 
-/* ── 조각 요소 ── */
-#layer-mid {
-  position: absolute;
-  top: 0; left: 0;
-  will-change: transform;
-  z-index: 2;
-}
-
-.piece {
-  position: absolute;
-  cursor: pointer;
-  overflow: hidden;
-  transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
-}
-.piece:hover { transform: scale(1.05); }
-.piece img {
-  display: block;
-  flex-shrink: 0;
-  display: block;
-  -webkit-user-drag: none;
-  user-select: none;
-  mix-blend-mode: multiply;
-}
-
 /* ── 팝업 ── */
 #popup {
   display: none;
@@ -104,23 +80,18 @@ body {
   z-index: 300;
   background: #fff;
   border: 0.5px solid #ccc;
-  padding: 18px 20px 18px 22px;
+  padding: 18px 20px;
   width: 260px;
   font-family: 'Courier New', monospace;
   animation: pop-in 0.18s ease;
+  pointer-events: none;
 }
 @keyframes pop-in {
   from { opacity:0; transform:translateY(6px); }
   to   { opacity:1; transform:translateY(0); }
 }
-#popup-close {
-  position: absolute; top:10px; right:12px;
-  background:none; border:none; cursor:pointer;
-  font-size:18px; color:#999; font-family:inherit;
-}
-#popup-close:hover { color:#111; }
 #popup-title {
   font-size:12px; font-weight:700; letter-spacing:0.1em;
-  color:#111; margin-bottom:8px; text-transform:uppercase; padding-right:20px;
+  color:#111; margin-bottom:8px; text-transform:uppercase;
 }
 #popup-desc { font-size:12px; color:#555; line-height:1.7; }
