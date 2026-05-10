@@ -1,47 +1,69 @@
-const canvas  = document.getElementById('canvas');
-const viewport = document.getElementById('viewport');
-const hint    = document.getElementById('ui-hint');
+/* =====================================================
+   main.js — 패럴랙스 2레이어 (배경 + 중경)
+   ===================================================== */
 
+const layerBg  = document.getElementById('layer-bg');
+const layerMid = document.getElementById('layer-mid');
+const hint     = document.getElementById('ui-hint');
+
+/* ── 타일 크기 ── */
 const IMG_W  = 4000;
 const IMG_H  = 2500;
 const SCALE  = 1.2;
-const TILE_W = IMG_W * SCALE;
-const TILE_H = IMG_H * SCALE;
+const TILE_W = IMG_W * SCALE;  /* 4800px */
+const TILE_H = IMG_H * SCALE;  /* 3000px */
 
-canvas.style.width  = TILE_W * 3 + 'px';
-canvas.style.height = TILE_H * 3 + 'px';
+/* 배경 + 중경 레이어 크기 세팅 */
+[layerBg, layerMid].forEach(layer => {
+  layer.style.width  = TILE_W * 3 + 'px';
+  layer.style.height = TILE_H * 3 + 'px';
+});
 
-document.querySelectorAll('.tile').forEach((tile, i) => {
-  const col = i % 3, row = Math.floor(i / 3);
+/* 타일 위치/크기 세팅 */
+document.querySelectorAll('.tile, .mid-tile').forEach((tile, i) => {
+  const idx = i % 9;  /* 레이어당 9장 */
+  const col = idx % 3, row = Math.floor(idx / 3);
   tile.style.width  = TILE_W + 'px';
   tile.style.height = TILE_H + 'px';
   tile.style.left   = col * TILE_W + 'px';
   tile.style.top    = row * TILE_H + 'px';
 });
 
-let x = -(TILE_W - window.innerWidth)  / 2 - TILE_W;
-let y = -(TILE_H - window.innerHeight) / 2 - TILE_H;
+/* ── 패럴랙스 속도 ──
+   BG  : 0.2 → 느림 (멀리 있는 느낌)
+   MID : 0.6 → 빠름 (앞에 있는 느낌)
+   차이가 클수록 깊이감이 강해짐
+*/
+const SPEED_BG  = 0.2;
+const SPEED_MID = 0.6;
+
+/* ── 스크롤 상태 ── */
+let x = 0, y = 0;
 let velX = 0, velY = 0;
 let rafId = null;
 let hintHidden = false;
 
-function applyTransform() {
-  canvas.style.transform = `translate(${x}px, ${y}px)`;
+function wrap(val, size) {
+  if (val > 0)      return val - size;
+  if (val < -size)  return val + size;
+  return val;
 }
 
-function wrap() {
-  if (x > -TILE_W + window.innerWidth)      x -= TILE_W;
-  if (x < -TILE_W * 2 + window.innerWidth)  x += TILE_W;
-  if (y > -TILE_H + window.innerHeight)     y -= TILE_H;
-  if (y < -TILE_H * 2 + window.innerHeight) y += TILE_H;
+function applyParallax() {
+  const bgX  = wrap(x * SPEED_BG,  TILE_W);
+  const bgY  = wrap(y * SPEED_BG,  TILE_H);
+  const midX = wrap(x * SPEED_MID, TILE_W);
+  const midY = wrap(y * SPEED_MID, TILE_H);
+
+  layerBg.style.transform  = `translate(${bgX}px,  ${bgY}px)`;
+  layerMid.style.transform = `translate(${midX}px, ${midY}px)`;
 }
 
 function inertia() {
   if (Math.abs(velX) < 0.3 && Math.abs(velY) < 0.3) { velX = velY = 0; return; }
   velX *= 0.92; velY *= 0.92;
   x += velX; y += velY;
-  wrap();
-  applyTransform();
+  applyParallax();
   rafId = requestAnimationFrame(inertia);
 }
 
@@ -49,6 +71,7 @@ function hideHint() {
   if (!hintHidden) { hint.classList.add('hidden'); hintHidden = true; }
 }
 
+/* ── 휠 스크롤 ── */
 window.addEventListener('wheel', e => {
   e.preventDefault();
   cancelAnimationFrame(rafId);
@@ -60,12 +83,12 @@ window.addEventListener('wheel', e => {
   velX = Math.max(-MAX, Math.min(MAX, velX));
   velY = Math.max(-MAX, Math.min(MAX, velY));
   x += velX; y += velY;
-  wrap();
-  applyTransform();
+  applyParallax();
   hideHint();
   rafId = requestAnimationFrame(inertia);
 }, { passive: false });
 
+/* ── 터치 ── */
 let touchPrevX = 0, touchPrevY = 0;
 document.addEventListener('touchstart', e => {
   touchPrevX = e.touches[0].clientX;
@@ -77,14 +100,14 @@ document.addEventListener('touchstart', e => {
 document.addEventListener('touchmove', e => {
   e.preventDefault();
   const cx = e.touches[0].clientX, cy = e.touches[0].clientY;
-  velX = cx - touchPrevX; velY = cy - touchPrevY;
+  velX = (cx - touchPrevX) * 0.1;
+  velY = (cy - touchPrevY) * 0.1;
   touchPrevX = cx; touchPrevY = cy;
   x += velX; y += velY;
-  wrap();
-  applyTransform();
+  applyParallax();
 }, { passive: false });
 document.addEventListener('touchend', () => {
   rafId = requestAnimationFrame(inertia);
 });
 
-applyTransform();
+applyParallax();
