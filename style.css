@@ -13,14 +13,12 @@ body {
   overflow:hidden;
 }
 
-/* ── 레이어 공통 ── */
 #layer-bg, #layer-mid {
   position:absolute;
   top:0; left:0;
   will-change:transform;
 }
 
-/* ── 배경 타일 ── */
 #layer-bg { z-index:1; }
 
 .tile {
@@ -30,7 +28,6 @@ body {
   background-position:center;
 }
 
-/* ── 중경 타일 (요소2) ── */
 #layer-mid { z-index:2; }
 
 .mid-tile {
@@ -38,8 +35,30 @@ body {
   background-image:url('images/요소2.png');
   background-size:cover;
   background-position:center;
-  /* 검정이 투명 처리됐으므로 배경이 비침 */
 }
+
+/* ── 판 시스템 ──────────────────────────────────
+   position: fixed → 화면(뷰포트) 기준으로 고정
+   100vw / 100vh   → 화면 꽉 채움
+   JS에서 랜덤으로 4개 중 2개 선택해서 보여줌
+─────────────────────────────────────────────── */
+.panel {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 999;
+  pointer-events: none;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+#panel-a { background-image: url('images/가림막1.png'); }
+#panel-b { background-image: url('images/가림막2.png'); }
+#panel-c { background-image: url('images/가림막3.png'); }
+#panel-d { background-image: url('images/가림막4.png'); }
 
 /* ── UI ── */
 #ui-hint {
