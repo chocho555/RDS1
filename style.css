@@ -79,6 +79,11 @@ body {
   src: url('fonts/AppleSDGothicNeoR.ttf') format('truetype');
   font-weight: normal;
 }
+@font-face {
+  font-family: 'AppleSDGothicNeo';
+  src: url('fonts/AppleSDGothicNeoSB.ttf') format('truetype');
+  font-weight: 600;
+}
 
 .popup {
   position: fixed;
@@ -97,9 +102,9 @@ body {
 .popup-text {
   font-family: 'AppleSDGothicNeo', sans-serif;
   font-size: 24px;
-  font-weight: normal;
+  font-weight: 600;
   color: #ffffff;
   line-height: 1.5;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.05em;
   margin: 0;
 }
