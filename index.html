@@ -11,8 +11,6 @@
   <div id="ui-hint">scroll to explore</div>
 
   <div id="viewport">
-
-    <!-- 레이어 0: 배경 (speed 0.2) — 가장 느림 -->
     <div id="layer-bg">
       <div class="tile" style="left:0%;       top:0%"></div>
       <div class="tile" style="left:33.3334%; top:0%"></div>
@@ -24,8 +22,6 @@
       <div class="tile" style="left:33.3334%; top:66.6667%"></div>
       <div class="tile" style="left:66.6667%; top:66.6667%"></div>
     </div>
-
-    <!-- 레이어 1: 요소2 사진들 (speed 0.6) — 중간 -->
     <div id="layer-mid">
       <div class="mid-tile" style="left:0%;       top:0%"></div>
       <div class="mid-tile" style="left:33.3334%; top:0%"></div>
@@ -37,8 +33,13 @@
       <div class="mid-tile" style="left:33.3334%; top:66.6667%"></div>
       <div class="mid-tile" style="left:66.6667%; top:66.6667%"></div>
     </div>
-
   </div>
+
+  <!-- 판 4개 (화면 고정, JS가 랜덤 2개 선택) -->
+  <div class="panel" id="panel-a"></div>
+  <div class="panel" id="panel-b"></div>
+  <div class="panel" id="panel-c"></div>
+  <div class="panel" id="panel-d"></div>
 
   <script src="main.js"></script>
 </body>
