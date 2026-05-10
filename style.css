@@ -1,36 +1,50 @@
-*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
 body {
-  width:100vw; height:100vh;
-  overflow:hidden;
-  background:#f0ede8;
-  font-family:'Courier New', monospace;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: #f0ede8;
+  cursor: grab;
+  user-select: none;
+  font-family: 'Courier New', monospace;
 }
 
-#viewport {
-  position:absolute;
-  inset:0;
-  overflow:hidden;
+body.dragging {
+  cursor: grabbing;
 }
 
-#canvas {
-  position:absolute;
-  will-change:transform;
+#scene {
+  position: absolute;
+  inset: 0;
 }
 
-.tile {
-  position:absolute;
-  background-image:url('images/bg/사문디_배경.jpg');
-  background-size:cover;
-  background-position:center;
+.piece {
+  position: absolute;
+  background-image: url('images/bg/사문디_배경.jpg');
+  background-size: cover;
+  will-change: transform;
 }
 
-#ui-hint {
-  position:fixed; bottom:28px; left:50%;
-  transform:translateX(-50%);
-  z-index:100; font-size:10px; letter-spacing:0.3em;
-  color:rgba(0,0,0,0.3); text-transform:uppercase;
-  pointer-events:none; white-space:nowrap;
-  transition:opacity 1s ease;
+#hint {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  color: rgba(0, 0, 0, 0.3);
+  text-transform: uppercase;
+  pointer-events: none;
+  white-space: nowrap;
+  transition: opacity 1s ease;
 }
-#ui-hint.hidden { opacity:0; }
+
+#hint.hidden {
+  opacity: 0;
+}
