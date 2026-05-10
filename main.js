@@ -2,146 +2,352 @@
    main.js
    ===================================================== */
 
-const canvas   = document.getElementById('canvas');
-const viewport = document.getElementById('viewport');
-const hint     = document.getElementById('ui-hint');
-const coordsEl = document.getElementById('ui-coords');
+const world      = document.getElementById('world');
+const tileCanvas = document.getElementById('tile-canvas');
+const ctx        = tileCanvas.getContext('2d');
+const hint       = document.getElementById('ui-hint');
+const coordsEl   = document.getElementById('ui-coords');
+const popup      = document.getElementById('popup');
 
-/* ── 타일 크기 설정 ───────────────────────────────
-   SCALE 값을 높이면 더 확대됨 (= 더 좁은 시야)
-─────────────────────────────────────────────────── */
-const IMG_W = 4000;
-const IMG_H = 2500;
-const SCALE = 1.2;   /* ★ 확대 배율 조절 */
+/* ── 월드 크기 ── */
+const WORLD_W = 3600;
+const WORLD_H = 1800;
 
-const TILE_W = IMG_W * SCALE;
-const TILE_H = IMG_H * SCALE;
+/* ── 배경 이미지 로드 ── */
+const bgImg = new Image();
+bgImg.src = 'images/bg/사문디_배경.jpg';
 
-/* 캔버스 = 타일 3×3 */
-canvas.style.width  = TILE_W * 3 + 'px';
-canvas.style.height = TILE_H * 3 + 'px';
+/* =====================================================
+   1. 타일 생성 — 다양한 크기의 격자
+   ===================================================== */
 
-/* 타일 크기 + 위치 적용 */
-document.querySelectorAll('.tile').forEach((tile, i) => {
-  const col = i % 3;
-  const row = Math.floor(i / 3);
-  tile.style.width  = TILE_W + 'px';
-  tile.style.height = TILE_H + 'px';
-  tile.style.left   = col * TILE_W + 'px';
-  tile.style.top    = row * TILE_H + 'px';
-});
+/*
+  기본 셀 크기: 80~200px 사이 랜덤
+  세 가지 크기 그룹을 섞어서 다양한 느낌을 줍니다
+  - 작은 타일: 60~100px
+  - 중간 타일: 100~160px
+  - 큰 타일:   160~240px
+*/
+const SIZE_GROUPS = [
+  { min: 60,  max: 100, weight: 4 },
+  { min: 100, max: 160, weight: 3 },
+  { min: 160, max: 240, weight: 2 },
+];
 
-/* ── 시작 위치: 중앙 타일 중심이 화면 중앙에 오도록 ── */
-let x = -(TILE_W - window.innerWidth)  / 2 - TILE_W;
-let y = -(TILE_H - window.innerHeight) / 2 - TILE_H;
+function randSize() {
+  const totalWeight = SIZE_GROUPS.reduce((s, g) => s + g.weight, 0);
+  let r = Math.random() * totalWeight;
+  for (const g of SIZE_GROUPS) {
+    r -= g.weight;
+    if (r <= 0) return Math.round(g.min + Math.random() * (g.max - g.min));
+  }
+  return 120;
+}
 
+/* 타일 배열 생성 */
+const tiles = [];
+
+let rowY = 0;
+while (rowY < WORLD_H) {
+  const rowH = randSize();
+  let colX = 0;
+  while (colX < WORLD_W) {
+    const colW = randSize();
+    tiles.push({
+      x: colX, y: rowY,
+      w: colW, h: rowH,
+      /* 슬라이드 오프셋: 양수 = 오른쪽, 음수 = 왼쪽으로 밀림 */
+      offsetX: 0,
+      /* 드래그 상태 */
+      dragging: false,
+      startMouseX: 0,
+      startOffsetX: 0,
+      /* 밀려난 기준 (절반 이상 밀리면 완전히 사라짐) */
+      gone: false,
+    });
+    colX += colW;
+  }
+  rowY += rowH;
+}
+
+/* =====================================================
+   2. Canvas 렌더링
+   ===================================================== */
+
+tileCanvas.width  = WORLD_W;
+tileCanvas.height = WORLD_H;
+
+/* 배경 이미지를 월드 크기에 맞게 스케일 계산 */
+let bgScaleX = 1, bgScaleY = 1;
+bgImg.onload = () => {
+  bgScaleX = WORLD_W / bgImg.naturalWidth;
+  bgScaleY = WORLD_H / bgImg.naturalHeight;
+  drawTiles();
+};
+
+function drawTiles() {
+  ctx.clearRect(0, 0, WORLD_W, WORLD_H);
+
+  for (const t of tiles) {
+    if (t.gone) continue;
+
+    const drawX = t.x + t.offsetX;
+
+    ctx.save();
+    /* 타일 영역으로 클리핑 — 이 밖으로 이미지가 삐져나오지 않음 */
+    ctx.beginPath();
+    ctx.rect(t.x, t.y, t.w, t.h);
+    ctx.clip();
+
+    if (bgImg.complete && bgImg.naturalWidth) {
+      /* 배경 이미지에서 해당 타일 영역만 잘라 그림 */
+      ctx.drawImage(
+        bgImg,
+        t.x / bgScaleX, t.y / bgScaleY,       /* 소스 위치 */
+        t.w / bgScaleX, t.h / bgScaleY,        /* 소스 크기 */
+        drawX, t.y, t.w, t.h                   /* 캔버스 위치/크기 */
+      );
+    } else {
+      /* 이미지 로드 전: 회색 채우기 */
+      ctx.fillStyle = '#d0cdc8';
+      ctx.fillRect(drawX, t.y, t.w, t.h);
+    }
+
+    /* 타일 경계선 — 얇고 연하게 */
+    ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+    ctx.lineWidth = 0.5;
+    ctx.strokeRect(drawX + 0.25, t.y + 0.25, t.w - 0.5, t.h - 0.5);
+
+    ctx.restore();
+  }
+}
+
+/* =====================================================
+   3. 월드 스크롤 (휠)
+   ===================================================== */
+
+let worldX = 0, worldY = 0;
 let velX = 0, velY = 0;
-let rafId = null;
+let scrollRaf = null;
 let hintHidden = false;
 
-/* ── 캔버스 이동 적용 ──────────────────────────── */
-function applyTransform() {
-  canvas.style.transform = `translate(${x}px, ${y}px)`;
-  coordsEl.textContent =
-    `${Math.round((((-x) % TILE_W) + TILE_W) % TILE_W)} / ` +
-    `${Math.round((((-y) % TILE_H) + TILE_H) % TILE_H)}`;
+function applyWorldTransform() {
+  world.style.transform = `translate(${worldX}px, ${worldY}px)`;
+  coordsEl.textContent  = `${Math.round(-worldX)} / ${Math.round(-worldY)}`;
 }
 
-/* ── 무한 루프: 타일 1장 크기 벗어나면 snap ────── */
-function wrapPosition() {
-  if (x > -TILE_W + window.innerWidth)      x -= TILE_W;
-  if (x < -TILE_W * 2 + window.innerWidth)  x += TILE_W;
-  if (y > -TILE_H + window.innerHeight)     y -= TILE_H;
-  if (y < -TILE_H * 2 + window.innerHeight) y += TILE_H;
+function clampWorld() {
+  worldX = Math.max(-(WORLD_W - window.innerWidth),  Math.min(0, worldX));
+  worldY = Math.max(-(WORLD_H - window.innerHeight), Math.min(0, worldY));
 }
 
-/* ── 관성 이동 ─────────────────────────────────
-   0.92 = 감속 계수 (낮추면 빨리 멈춤, 높이면 오래 미끄러짐)
-──────────────────────────────────────────────── */
-function inertia() {
-  if (Math.abs(velX) < 0.3 && Math.abs(velY) < 0.3) {
-    velX = velY = 0;
-    return;
-  }
-  velX *= 0.8;
-  velY *= 0.8;
-  x += velX;
-  y += velY;
-  wrapPosition();
-  applyTransform();
-  rafId = requestAnimationFrame(inertia);
+function scrollInertia() {
+  if (Math.abs(velX) < 0.3 && Math.abs(velY) < 0.3) { velX = velY = 0; return; }
+  velX *= 0.92; velY *= 0.92;
+  worldX += velX; worldY += velY;
+  clampWorld();
+  applyWorldTransform();
+  scrollRaf = requestAnimationFrame(scrollInertia);
 }
 
 function hideHint() {
-  if (!hintHidden) {
-    hint.classList.add('hidden');
-    hintHidden = true;
-  }
+  if (!hintHidden) { hint.classList.add('hidden'); hintHidden = true; }
 }
 
-/* ── 휠 스크롤 (모든 방향) ──────────────────────
-   trackpad: deltaX + deltaY 동시 지원 (2D 스크롤)
-   마우스 휠: deltaY 만 있으므로 상하 이동
-   SPEED 로 감도 조절
-──────────────────────────────────────────────── */
-const SPEED = 0.05;  /* ★ 스크롤 감도 (높이면 더 빠름) */
-
+const SCROLL_SPEED = 1.2;
 window.addEventListener('wheel', e => {
+  /* 타일 드래그 중엔 월드 스크롤 막기 */
+  if (activeTile) return;
   e.preventDefault();
-  cancelAnimationFrame(rafId);
+  cancelAnimationFrame(scrollRaf);
 
-  /* 단위 정규화 (line / page 모드 대응) */
-  let dx = e.deltaX;
-  let dy = e.deltaY;
+  let dx = e.deltaX, dy = e.deltaY;
   if (e.deltaMode === 1) { dx *= 20;  dy *= 20;  }
   if (e.deltaMode === 2) { dx *= 400; dy *= 400; }
 
-  /* 속도 누적 */
-  velX -= dx * SPEED;
-  velY -= dy * SPEED;
-
-  /* 속도 상한 (너무 빠르게 튀는 것 방지) */
+  velX -= dx * SCROLL_SPEED;
+  velY -= dy * SCROLL_SPEED;
   const MAX = 60;
   velX = Math.max(-MAX, Math.min(MAX, velX));
   velY = Math.max(-MAX, Math.min(MAX, velY));
 
-  x += velX;
-  y += velY;
-  wrapPosition();
-  applyTransform();
+  worldX += velX; worldY += velY;
+  clampWorld();
+  applyWorldTransform();
   hideHint();
-
-  rafId = requestAnimationFrame(inertia);
+  scrollRaf = requestAnimationFrame(scrollInertia);
 }, { passive: false });
 
-/* ── 터치 스크롤 (모바일) ───────────────────────  */
-let touchPrevX = 0, touchPrevY = 0;
+/* =====================================================
+   4. 타일 드래그 (슬라이드)
+   ===================================================== */
 
-document.addEventListener('touchstart', e => {
-  touchPrevX = e.touches[0].clientX;
-  touchPrevY = e.touches[0].clientY;
-  velX = velY = 0;
-  cancelAnimationFrame(rafId);
+let activeTile   = null;   /* 현재 드래그 중인 타일 */
+let dragStartX   = 0;
+let tileRaf      = null;
+
+/* 화면 좌표 → 월드 좌표 변환 */
+function toWorldX(screenX) { return screenX - worldX; }
+function toWorldY(screenY) { return screenY - worldY; }
+
+/* 마우스/터치 위치에서 타일 찾기 */
+function getTileAt(wx, wy) {
+  /* 뒤에서부터 탐색 (나중에 그려진 타일이 위에 있음) */
+  for (let i = tiles.length - 1; i >= 0; i--) {
+    const t = tiles[i];
+    if (t.gone) continue;
+    if (wx >= t.x && wx <= t.x + t.w &&
+        wy >= t.y && wy <= t.y + t.h) return t;
+  }
+  return null;
+}
+
+tileCanvas.addEventListener('mousedown', e => {
+  const wx = toWorldX(e.clientX);
+  const wy = toWorldY(e.clientY);
+  const t  = getTileAt(wx, wy);
+  if (!t) return;
+
+  activeTile = t;
+  dragStartX = e.clientX - t.offsetX;
+  t.dragging = true;
+  tileCanvas.classList.add('grabbing');
+  cancelAnimationFrame(scrollRaf); /* 드래그 중 스크롤 관성 멈춤 */
+  hideHint();
+});
+
+window.addEventListener('mousemove', e => {
+  if (!activeTile) return;
+  activeTile.offsetX = e.clientX - dragStartX;
+  checkGone(activeTile);
+  drawTiles();
+});
+
+window.addEventListener('mouseup', e => {
+  if (!activeTile) return;
+  finishTileDrag(activeTile, e.clientX);
+  activeTile = null;
+  tileCanvas.classList.remove('grabbing');
+});
+
+/* 터치 */
+tileCanvas.addEventListener('touchstart', e => {
+  e.stopPropagation();
+  const t0  = e.touches[0];
+  const wx  = toWorldX(t0.clientX);
+  const wy  = toWorldY(t0.clientY);
+  const t   = getTileAt(wx, wy);
+  if (!t) return;
+  activeTile = t;
+  dragStartX = t0.clientX - t.offsetX;
+  t.dragging = true;
   hideHint();
 }, { passive: true });
 
-document.addEventListener('touchmove', e => {
+window.addEventListener('touchmove', e => {
+  if (!activeTile) return;
   e.preventDefault();
-  const cx = e.touches[0].clientX;
-  const cy = e.touches[0].clientY;
-  velX = cx - touchPrevX;
-  velY = cy - touchPrevY;
-  touchPrevX = cx;
-  touchPrevY = cy;
-  x += velX;
-  y += velY;
-  wrapPosition();
-  applyTransform();
+  activeTile.offsetX = e.touches[0].clientX - dragStartX;
+  checkGone(activeTile);
+  drawTiles();
 }, { passive: false });
 
-document.addEventListener('touchend', () => {
-  rafId = requestAnimationFrame(inertia);
+window.addEventListener('touchend', e => {
+  if (!activeTile) return;
+  finishTileDrag(activeTile, e.changedTouches[0].clientX);
+  activeTile = null;
 });
 
-/* ── 초기 렌더링 ──────────────────────────────── */
-applyTransform();
+/*
+  타일이 절반(w/2) 이상 밀리면 gone 처리
+  → 아래 사진이 완전히 드러남
+*/
+function checkGone(t) {
+  if (Math.abs(t.offsetX) > t.w * 0.5) t.gone = true;
+}
+
+/*
+  드래그 끝:
+  - 절반 미만이면 snap back (제자리로)
+  - 절반 이상이면 슬라이드 아웃 애니메이션 후 gone
+*/
+function finishTileDrag(t, finalX) {
+  t.dragging = false;
+  if (t.gone) {
+    slideOut(t);
+  } else {
+    snapBack(t);
+  }
+}
+
+function snapBack(t) {
+  const from = t.offsetX;
+  const start = performance.now();
+  const dur   = 280;
+  function step(now) {
+    const p = Math.min((now - start) / dur, 1);
+    const ease = 1 - Math.pow(1 - p, 3);
+    t.offsetX = from * (1 - ease);
+    drawTiles();
+    if (p < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+function slideOut(t) {
+  const from  = t.offsetX;
+  /* 방향에 따라 화면 밖으로 */
+  const to    = t.offsetX > 0 ? WORLD_W : -WORLD_W;
+  const start = performance.now();
+  const dur   = 320;
+  function step(now) {
+    const p = Math.min((now - start) / dur, 1);
+    const ease = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+    t.offsetX = from + (to - from) * ease;
+    drawTiles();
+    if (p < 1) requestAnimationFrame(step);
+    else { t.gone = true; drawTiles(); }
+  }
+  requestAnimationFrame(step);
+}
+
+/* =====================================================
+   5. 사진 클릭 팝업
+   ===================================================== */
+
+const popupEl    = document.getElementById('popup');
+const popupClose = document.getElementById('popup-close');
+const popupTitle = document.getElementById('popup-title');
+const popupDesc  = document.getElementById('popup-desc');
+
+document.querySelectorAll('.photo-item').forEach(el => {
+  el.addEventListener('click', e => {
+    /* 타일이 아직 덮고 있으면 무시 */
+    const wx = toWorldX(e.clientX);
+    const wy = toWorldY(e.clientY);
+    if (getTileAt(wx, wy)) return;
+
+    popupTitle.textContent = el.dataset.title;
+    popupDesc.textContent  = el.dataset.desc;
+
+    const rect = el.getBoundingClientRect();
+    let left = rect.right + 12;
+    let top  = rect.top;
+    if (left + 280 > window.innerWidth)  left = rect.left - 272;
+    if (top  + 140 > window.innerHeight) top  = window.innerHeight - 150;
+    popupEl.style.left    = left + 'px';
+    popupEl.style.top     = top  + 'px';
+    popupEl.style.display = 'block';
+    e.stopPropagation();
+  });
+});
+
+popupClose.addEventListener('click', () => { popupEl.style.display = 'none'; });
+document.addEventListener('click',   e => {
+  if (!e.target.closest('#popup') && !e.target.closest('.photo-item'))
+    popupEl.style.display = 'none';
+});
+
+/* ── 초기 렌더링 ── */
+applyWorldTransform();
+drawTiles();
