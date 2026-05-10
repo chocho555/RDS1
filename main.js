@@ -13,19 +13,20 @@ const SCALE  = 1.2;
 const TILE_W = IMG_W * SCALE;
 const TILE_H = IMG_H * SCALE;
 
-[layerBg, layerMid].forEach(layer => {
-  layer.style.width  = TILE_W * 3 + 'px';
-  layer.style.height = TILE_H * 3 + 'px';
-});
+layerBg.style.width  = TILE_W * 3 + 'px';
+layerBg.style.height = TILE_H * 3 + 'px';
 
-document.querySelectorAll('.tile, .mid-tile').forEach((tile, i) => {
-  const idx = i % 9;
-  const col = idx % 3, row = Math.floor(idx / 3);
+document.querySelectorAll('.tile').forEach((tile, i) => {
+  const col = i % 3, row = Math.floor(i / 3);
   tile.style.width  = TILE_W + 'px';
   tile.style.height = TILE_H + 'px';
   tile.style.left   = col * TILE_W + 'px';
   tile.style.top    = row * TILE_H + 'px';
 });
+
+/* 중경 레이어 크기 */
+layerMid.style.width  = TILE_W + 'px';
+layerMid.style.height = TILE_H + 'px';
 
 /* ── 패럴랙스 속도 ── */
 const SPEED_BG  = 0.2;
@@ -96,10 +97,35 @@ document.addEventListener('touchend', () => {
 
 applyParallax();
 
-/* =====================================================
-   판 시스템
-   - 1분마다 4개 중 랜덤 2개를 10초간 표시
-   ===================================================== */
+/* ── 조각 클릭 팝업 ── */
+const popup      = document.getElementById('popup');
+const popupClose = document.getElementById('popup-close');
+const popupTitle = document.getElementById('popup-title');
+const popupDesc  = document.getElementById('popup-desc');
+
+document.querySelectorAll('.piece').forEach(el => {
+  el.addEventListener('click', e => {
+    popupTitle.textContent = el.dataset.title;
+    popupDesc.textContent  = el.dataset.desc;
+    const rect = el.getBoundingClientRect();
+    let left = rect.right + 12, top = rect.top;
+    if (left + 280 > window.innerWidth)  left = rect.left - 272;
+    if (top  + 140 > window.innerHeight) top  = window.innerHeight - 150;
+    if (left < 0) left = 8;
+    popup.style.left    = left + 'px';
+    popup.style.top     = top  + 'px';
+    popup.style.display = 'block';
+    e.stopPropagation();
+  });
+});
+
+popupClose.addEventListener('click', () => { popup.style.display = 'none'; });
+document.addEventListener('click', e => {
+  if (!e.target.closest('#popup') && !e.target.closest('.piece'))
+    popup.style.display = 'none';
+});
+
+/* ── 판 시스템 ── */
 const panels = [
   document.getElementById('panel-a'),
   document.getElementById('panel-b'),
@@ -120,10 +146,7 @@ function showPanels() {
   panels.forEach(p => p.style.display = 'none');
   const picked = shuffle(panels).slice(0, 2);
   picked.forEach(p => p.style.display = 'block');
-  setTimeout(() => {
-    picked.forEach(p => p.style.display = 'none');
-  }, 10000);
+  setTimeout(() => { picked.forEach(p => p.style.display = 'none'); }, 10000);
 }
 
-/* 1분마다 반복 */
 setInterval(showPanels, 60000);

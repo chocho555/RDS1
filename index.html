@@ -11,6 +11,7 @@
   <div id="ui-hint">scroll to explore</div>
 
   <div id="viewport">
+    <!-- 레이어 0: 배경 -->
     <div id="layer-bg">
       <div class="tile" style="left:0%;       top:0%"></div>
       <div class="tile" style="left:33.3334%; top:0%"></div>
@@ -22,24 +23,63 @@
       <div class="tile" style="left:33.3334%; top:66.6667%"></div>
       <div class="tile" style="left:66.6667%; top:66.6667%"></div>
     </div>
+
+    <!-- 레이어 1: 조각 사진들 (클릭 가능) -->
     <div id="layer-mid">
-      <div class="mid-tile" style="left:0%;       top:0%"></div>
-      <div class="mid-tile" style="left:33.3334%; top:0%"></div>
-      <div class="mid-tile" style="left:66.6667%; top:0%"></div>
-      <div class="mid-tile" style="left:0%;       top:33.3334%"></div>
-      <div class="mid-tile" style="left:33.3334%; top:33.3334%"></div>
-      <div class="mid-tile" style="left:66.6667%; top:33.3334%"></div>
-      <div class="mid-tile" style="left:0%;       top:66.6667%"></div>
-      <div class="mid-tile" style="left:33.3334%; top:66.6667%"></div>
-      <div class="mid-tile" style="left:66.6667%; top:66.6667%"></div>
+      <!--
+        원본 캔버스: 4000×2500px (SCALE 1.2 적용 = 4800×3000px)
+        각 조각의 left/top/width/height 는 원본 좌표 × 1.2
+      -->
+      <div class="piece" style="left:103px;  top:2066px; width:438px;"  data-title="조각 1"  data-desc="설명을 입력하세요."><img src="images/조각/조각1.png"  draggable="false"></div>
+      <div class="piece" style="left:2149px; top:317px;  width:816px;"  data-title="조각 2"  data-desc="설명을 입력하세요."><img src="images/조각/조각2.png"  draggable="false"></div>
+      <div class="piece" style="left:582px;  top:203px;  width:336px;"  data-title="조각 3"  data-desc="설명을 입력하세요."><img src="images/조각/조각3.png"  draggable="false"></div>
+      <div class="piece" style="left:1843px; top:2170px; width:487px;"  data-title="조각 4"  data-desc="설명을 입력하세요."><img src="images/조각/조각4.png"  draggable="false"></div>
+      <div class="piece" style="left:3716px; top:428px;  width:348px;"  data-title="조각 5"  data-desc="설명을 입력하세요."><img src="images/조각/조각5.png"  draggable="false"></div>
+      <div class="piece" style="left:2891px; top:2561px; width:482px;"  data-title="조각 6"  data-desc="설명을 입력하세요."><img src="images/조각/조각6.png"  draggable="false"></div>
+      <div class="piece" style="left:3371px; top:2562px; width:302px;"  data-title="조각 7"  data-desc="설명을 입력하세요."><img src="images/조각/조각7.png"  draggable="false"></div>
+      <div class="piece" style="left:4147px; top:1008px; width:460px;"  data-title="조각 8"  data-desc="설명을 입력하세요."><img src="images/조각/조각8.png"  draggable="false"></div>
+      <div class="piece" style="left:0px;    top:0px;    width:209px;"  data-title="조각 9"  data-desc="설명을 입력하세요."><img src="images/조각/조각9.png"  draggable="false"></div>
+      <div class="piece" style="left:3232px; top:2137px; width:457px;"  data-title="조각 10" data-desc="설명을 입력하세요."><img src="images/조각/조각10.png" draggable="false"></div>
+      <div class="piece" style="left:434px;  top:1008px; width:661px;"  data-title="조각 11" data-desc="설명을 입력하세요."><img src="images/조각/조각11.png" draggable="false"></div>
+      <div class="piece" style="left:2110px; top:1884px; width:443px;"  data-title="조각 12" data-desc="설명을 입력하세요."><img src="images/조각/조각12.png" draggable="false"></div>
+      <div class="piece" style="left:1949px; top:990px;  width:383px;"  data-title="조각 13" data-desc="설명을 입력하세요."><img src="images/조각/조각13.png" draggable="false"></div>
+      <div class="piece" style="left:960px;  top:2249px; width:292px;"  data-title="조각 14" data-desc="설명을 입력하세요."><img src="images/조각/조각14.png" draggable="false"></div>
+      <div class="piece" style="left:2813px; top:2642px; width:338px;"  data-title="조각 15" data-desc="설명을 입력하세요."><img src="images/조각/조각15.png" draggable="false"></div>
+      <div class="piece" style="left:1661px; top:1238px; width:444px;"  data-title="조각 16" data-desc="설명을 입력하세요."><img src="images/조각/조각16.png" draggable="false"></div>
+      <div class="piece" style="left:0px;    top:821px;  width:440px;"  data-title="조각 17" data-desc="설명을 입력하세요."><img src="images/조각/조각17.png" draggable="false"></div>
+      <div class="piece" style="left:1501px; top:26px;   width:650px;"  data-title="조각 18" data-desc="설명을 입력하세요."><img src="images/조각/조각18.png" draggable="false"></div>
+      <div class="piece" style="left:749px;  top:426px;  width:382px;"  data-title="조각 19" data-desc="설명을 입력하세요."><img src="images/조각/조각19.png" draggable="false"></div>
+      <div class="piece" style="left:4108px; top:2170px; width:277px;"  data-title="조각 20" data-desc="설명을 입력하세요."><img src="images/조각/조각20.png" draggable="false"></div>
+      <div class="piece" style="left:1252px; top:1883px; width:322px;"  data-title="조각 21" data-desc="설명을 입력하세요."><img src="images/조각/조각21.png" draggable="false"></div>
+      <div class="piece" style="left:3811px; top:2352px; width:469px;"  data-title="조각 22" data-desc="설명을 입력하세요."><img src="images/조각/조각22.png" draggable="false"></div>
+      <div class="piece" style="left:4460px; top:26px;   width:338px;"  data-title="조각 23" data-desc="설명을 입력하세요."><img src="images/조각/조각23.png" draggable="false"></div>
+      <div class="piece" style="left:4312px; top:420px;  width:350px;"  data-title="조각 24" data-desc="설명을 입력하세요."><img src="images/조각/조각24.png" draggable="false"></div>
+      <div class="piece" style="left:749px;  top:2759px; width:220px;"  data-title="조각 25" data-desc="설명을 입력하세요."><img src="images/조각/조각25.png" draggable="false"></div>
+      <div class="piece" style="left:749px;  top:2525px; width:356px;"  data-title="조각 26" data-desc="설명을 입력하세요."><img src="images/조각/조각26.png" draggable="false"></div>
+      <div class="piece" style="left:3594px; top:2659px; width:433px;"  data-title="조각 27" data-desc="설명을 입력하세요."><img src="images/조각/조각27.png" draggable="false"></div>
+      <div class="piece" style="left:538px;  top:2267px; width:218px;"  data-title="조각 28" data-desc="설명을 입력하세요."><img src="images/조각/조각28.png" draggable="false"></div>
+      <div class="piece" style="left:462px;  top:614px;  width:286px;"  data-title="조각 29" data-desc="설명을 입력하세요."><img src="images/조각/조각29.png" draggable="false"></div>
+      <div class="piece" style="left:2611px; top:2448px; width:287px;"  data-title="조각 30" data-desc="설명을 입력하세요."><img src="images/조각/조각30.png" draggable="false"></div>
+      <div class="piece" style="left:3203px; top:0px;    width:514px;"  data-title="조각 31" data-desc="설명을 입력하세요."><img src="images/조각/조각31.png" draggable="false"></div>
+      <div class="piece" style="left:3841px; top:1238px; width:265px;"  data-title="조각 32" data-desc="설명을 입력하세요."><img src="images/조각/조각32.png" draggable="false"></div>
+      <div class="piece" style="left:4312px; top:1556px; width:487px;"  data-title="조각 33" data-desc="설명을 입력하세요."><img src="images/조각/조각33.png" draggable="false"></div>
+      <div class="piece" style="left:3595px; top:1841px; width:444px;"  data-title="조각 34" data-desc="설명을 입력하세요."><img src="images/조각/조각34.png" draggable="false"></div>
+      <div class="piece" style="left:2615px; top:1115px; width:1103px;" data-title="조각 35" data-desc="설명을 입력하세요."><img src="images/조각/조각35.png" draggable="false"></div>
     </div>
   </div>
 
-  <!-- 판 4개 (화면 고정, JS가 랜덤 2개 선택) -->
+  <!-- 판 4개 -->
   <div class="panel" id="panel-a"><img src="images/가림막1.png" draggable="false"></div>
   <div class="panel" id="panel-b"><img src="images/가림막2.png" draggable="false"></div>
   <div class="panel" id="panel-c"><img src="images/가림막3.png" draggable="false"></div>
   <div class="panel" id="panel-d"><img src="images/가림막4.png" draggable="false"></div>
+
+  <!-- 팝업 -->
+  <div id="popup">
+    <button id="popup-close">×</button>
+    <p id="popup-title"></p>
+    <p id="popup-desc"></p>
+  </div>
 
   <script src="main.js"></script>
 </body>
