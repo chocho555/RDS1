@@ -13,25 +13,20 @@ body {
   overflow:hidden;
 }
 
-/* 월드: JS가 스크롤 transform 적용 */
 #world {
   position:absolute;
   width:100%; height:100%;
 }
 
-/* 레이어 공통: JS가 개별 transform으로 패럴랙스 */
+/* 레이어 공통 */
 .layer {
   position:absolute;
   top:0; left:0;
   will-change:transform;
 }
 
-/* ── 배경 레이어 ── */
-#layer-bg {
-  /* 3×3 타일이 들어갈 공간 — JS에서 px로 세팅 */
-  position:absolute;
-  top:0; left:0;
-}
+/* ── 배경 ── */
+#layer-bg { position:absolute; top:0; left:0; }
 
 .tile {
   position:absolute;
@@ -51,32 +46,19 @@ body {
   position:relative;
 }
 
-/* 슬라이드쇼 캔버스: 이미지들이 전환됨 */
+/*
+  Canvas 하나로 슬라이드 이미지 그린 뒤
+  destination-in 으로 마스크 모양(빨간/선)만 남김
+  → 배경이 비쳐야 하므로 canvas 배경은 투명 유지
+*/
 #slideshow-canvas {
   position:absolute;
   top:0; left:0;
   display:block;
+  /* 캔버스 바깥은 완전 투명 — 배경이 그대로 보임 */
 }
 
-/*
-  마스크 오버레이:
-  빨간/선 부분만 남긴 PNG를 destination-in 합성으로
-  캔버스 위에 겹쳐서 해당 모양만 보이게 함
-  → mix-blend-mode: multiply 로 검정 부분 제거
-*/
-#mask-overlay {
-  position:absolute;
-  top:0; left:0;
-  width:100%; height:100%;
-  display:block;
-  /* 검정 배경을 날리고 빨간/선만 남김 */
-  mix-blend-mode: screen;
-  pointer-events:none;
-  -webkit-user-drag:none;
-  user-select:none;
-}
-
-/* ── 전경 레이어 ── */
+/* ── 전경 ── */
 #layer-fg {
   position:absolute;
   top:0; left:0;
