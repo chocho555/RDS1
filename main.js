@@ -98,9 +98,8 @@ applyParallax();
 
 /* =====================================================
    판 시스템
-   - 1분마다 4개 중 랜덤 2개를 화면에 뚝 표시
-   - 10초 후 뚝 사라짐
-   - 매번 다른 조합으로 나타남
+   - 진입 시 즉시 1회 + 이후 1분마다 실행
+   - 4개 중 랜덤 2개를 10초간 표시
    ===================================================== */
 const panels = [
   document.getElementById('panel-a'),
@@ -110,7 +109,6 @@ const panels = [
 ];
 
 function shuffle(arr) {
-  /* Fisher-Yates 셔플 */
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -120,18 +118,15 @@ function shuffle(arr) {
 }
 
 function showPanels() {
-  /* 모두 숨기고 */
   panels.forEach(p => p.style.display = 'none');
-
-  /* 4개 중 랜덤 2개 선택 */
   const picked = shuffle(panels).slice(0, 2);
   picked.forEach(p => p.style.display = 'block');
-
-  /* 10초 후 사라짐 */
   setTimeout(() => {
     picked.forEach(p => p.style.display = 'none');
   }, 10000);
 }
 
-/* 1분마다 실행 */
+/* 진입 즉시 1회 실행 */
+showPanels();
+/* 이후 1분마다 반복 */
 setInterval(showPanels, 60000);
