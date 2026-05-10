@@ -13,7 +13,7 @@
   <div id="viewport">
     <div id="world">
 
-      <!-- ░░ 레이어 0: 배경 (가장 느림 0.3x) ░░ -->
+      <!-- 레이어 0: 배경 -->
       <div class="layer" id="layer-bg">
         <div class="tile" style="left:0%;       top:0%"></div>
         <div class="tile" style="left:33.3334%; top:0%"></div>
@@ -26,50 +26,24 @@
         <div class="tile" style="left:66.6667%; top:66.6667%"></div>
       </div>
 
-      <!-- ░░ 레이어 1: 슬라이드쇼 + 빨간 요소 마스크 (중간 0.65x) ░░ -->
+      <!-- 레이어 1: 슬라이드쇼 (canvas만 — img 태그 없음) -->
       <div class="layer" id="layer-slideshow">
-
-        <!--
-          슬라이드쇼 캔버스:
-          이미지 50장이 빠르게 전환됨
-          요소1_mask.png의 빨간/선 영역에만 보임
-        -->
         <div id="slideshow-wrap">
           <canvas id="slideshow-canvas"></canvas>
-          <!-- 마스크: 검정=투명, 빨간/선만 남긴 PNG를 mix-blend-mode로 덮음 -->
-          <img id="mask-overlay" src="images/요소1_mask.png" draggable="false" />
         </div>
-
       </div>
 
-      <!-- ░░ 레이어 2: 전경 사진들 (가장 빠름 1.0x) ░░ -->
+      <!-- 레이어 2: 전경 사진들 -->
       <div class="layer" id="layer-fg">
         <!--
-          사진 준비되면 아래 형식으로 추가:
+          사진 준비되면 아래 형식으로 추가하세요:
           <div class="photo-item"
                style="left:Xpx; top:Ypx; width:Wpx;"
                data-title="제목"
                data-desc="설명">
             <img src="images/fg/파일명.png" draggable="false" />
           </div>
-
-          지금은 플레이스홀더 배치
         -->
-        <div class="photo-item" style="left:200px;  top:300px;  width:260px;" data-title="작품 1"  data-desc="설명을 입력하세요."><div class="ph"></div></div>
-        <div class="photo-item" style="left:560px;  top:180px;  width:200px;" data-title="작품 2"  data-desc="설명을 입력하세요."><div class="ph"></div></div>
-        <div class="photo-item" style="left:860px;  top:350px;  width:300px;" data-title="작품 3"  data-desc="설명을 입력하세요."><div class="ph"></div></div>
-        <div class="photo-item" style="left:1240px; top:200px;  width:240px;" data-title="작품 4"  data-desc="설명을 입력하세요."><div class="ph"></div></div>
-        <div class="photo-item" style="left:1560px; top:320px;  width:280px;" data-title="작품 5"  data-desc="설명을 입력하세요."><div class="ph"></div></div>
-        <div class="photo-item" style="left:1920px; top:180px;  width:220px;" data-title="작품 6"  data-desc="설명을 입력하세요."><div class="ph"></div></div>
-        <div class="photo-item" style="left:2220px; top:340px;  width:300px;" data-title="작품 7"  data-desc="설명을 입력하세요."><div class="ph"></div></div>
-        <div class="photo-item" style="left:2600px; top:200px;  width:240px;" data-title="작품 8"  data-desc="설명을 입력하세요."><div class="ph"></div></div>
-        <div class="photo-item" style="left:300px;  top:780px;  width:280px;" data-title="작품 9"  data-desc="설명을 입력하세요."><div class="ph"></div></div>
-        <div class="photo-item" style="left:680px;  top:700px;  width:200px;" data-title="작품 10" data-desc="설명을 입력하세요."><div class="ph"></div></div>
-        <div class="photo-item" style="left:980px;  top:800px;  width:300px;" data-title="작품 11" data-desc="설명을 입력하세요."><div class="ph"></div></div>
-        <div class="photo-item" style="left:1360px; top:720px;  width:260px;" data-title="작품 12" data-desc="설명을 입력하세요."><div class="ph"></div></div>
-        <div class="photo-item" style="left:1700px; top:780px;  width:220px;" data-title="작품 13" data-desc="설명을 입력하세요."><div class="ph"></div></div>
-        <div class="photo-item" style="left:2020px; top:700px;  width:300px;" data-title="작품 14" data-desc="설명을 입력하세요."><div class="ph"></div></div>
-        <div class="photo-item" style="left:2400px; top:760px;  width:240px;" data-title="작품 15" data-desc="설명을 입력하세요."><div class="ph"></div></div>
       </div>
 
     </div>
