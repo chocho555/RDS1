@@ -49,10 +49,8 @@ body {
   background-size: 100% 100%;
   background-repeat: no-repeat;
   background-position: center;
-  mix-blend-mode: multiply;
 }
 
-/* img 태그 숨기고 background-image로 처리 */
 .panel img { display: none; }
 
 #panel-a { background-image: url('images/가림막1.png'); }
