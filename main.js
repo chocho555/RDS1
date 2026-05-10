@@ -193,6 +193,11 @@ document.addEventListener('click', e => {
   e.stopPropagation();
 });
 
+/* 빈 곳 클릭 시 모든 팝업 제거 */
+document.addEventListener('click', () => {
+  document.querySelectorAll('.popup').forEach(p => p.remove());
+});
+
 /* ── 판 시스템 ── */
 const panels = [
   document.getElementById('panel-a'),
