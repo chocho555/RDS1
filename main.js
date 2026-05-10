@@ -63,8 +63,8 @@ function inertia() {
     velX = velY = 0;
     return;
   }
-  velX *= 0.95;
-  velY *= 0.95;
+  velX *= 0.92;
+  velY *= 0.92;
   x += velX;
   y += velY;
   wrapPosition();
@@ -84,7 +84,7 @@ function hideHint() {
    마우스 휠: deltaY 만 있으므로 상하 이동
    SPEED 로 감도 조절
 ──────────────────────────────────────────────── */
-const SPEED = 0.15;  /* ★ 스크롤 감도 (높이면 더 빠름) */
+const SPEED = 0.05;  /* ★ 스크롤 감도 (높이면 더 빠름) */
 
 window.addEventListener('wheel', e => {
   e.preventDefault();
