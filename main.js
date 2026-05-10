@@ -1,5 +1,5 @@
 /* =====================================================
-   main.js — 패럴랙스 2레이어 (배경 + 중경)
+   main.js
    ===================================================== */
 
 const layerBg  = document.getElementById('layer-bg');
@@ -10,18 +10,16 @@ const hint     = document.getElementById('ui-hint');
 const IMG_W  = 4000;
 const IMG_H  = 2500;
 const SCALE  = 1.2;
-const TILE_W = IMG_W * SCALE;  /* 4800px */
-const TILE_H = IMG_H * SCALE;  /* 3000px */
+const TILE_W = IMG_W * SCALE;
+const TILE_H = IMG_H * SCALE;
 
-/* 배경 + 중경 레이어 크기 세팅 */
 [layerBg, layerMid].forEach(layer => {
   layer.style.width  = TILE_W * 3 + 'px';
   layer.style.height = TILE_H * 3 + 'px';
 });
 
-/* 타일 위치/크기 세팅 */
 document.querySelectorAll('.tile, .mid-tile').forEach((tile, i) => {
-  const idx = i % 9;  /* 레이어당 9장 */
+  const idx = i % 9;
   const col = idx % 3, row = Math.floor(idx / 3);
   tile.style.width  = TILE_W + 'px';
   tile.style.height = TILE_H + 'px';
@@ -29,33 +27,22 @@ document.querySelectorAll('.tile, .mid-tile').forEach((tile, i) => {
   tile.style.top    = row * TILE_H + 'px';
 });
 
-/* ── 패럴랙스 속도 ──
-   BG  : 0.2 → 느림 (멀리 있는 느낌)
-   MID : 0.6 → 빠름 (앞에 있는 느낌)
-   차이가 클수록 깊이감이 강해짐
-*/
+/* ── 패럴랙스 속도 ── */
 const SPEED_BG  = 0.2;
 const SPEED_MID = 0.6;
 
-/* ── 스크롤 상태 ── */
 let x = 0, y = 0;
 let velX = 0, velY = 0;
 let rafId = null;
 let hintHidden = false;
 
-/* modulo 방식: 어느 방향으로 얼마나 가도 타일 범위 안으로 */
 function wrap(val, size) {
   return ((val % size) + size) % size - size;
 }
 
 function applyParallax() {
-  const bgX  = wrap(x * SPEED_BG,  TILE_W);
-  const bgY  = wrap(y * SPEED_BG,  TILE_H);
-  const midX = wrap(x * SPEED_MID, TILE_W);
-  const midY = wrap(y * SPEED_MID, TILE_H);
-
-  layerBg.style.transform  = `translate(${bgX}px,  ${bgY}px)`;
-  layerMid.style.transform = `translate(${midX}px, ${midY}px)`;
+  layerBg.style.transform  = `translate(${wrap(x * SPEED_BG,  TILE_W)}px, ${wrap(y * SPEED_BG,  TILE_H)}px)`;
+  layerMid.style.transform = `translate(${wrap(x * SPEED_MID, TILE_W)}px, ${wrap(y * SPEED_MID, TILE_H)}px)`;
 }
 
 function inertia() {
@@ -70,7 +57,6 @@ function hideHint() {
   if (!hintHidden) { hint.classList.add('hidden'); hintHidden = true; }
 }
 
-/* ── 휠 스크롤 ── */
 window.addEventListener('wheel', e => {
   e.preventDefault();
   cancelAnimationFrame(rafId);
@@ -87,7 +73,6 @@ window.addEventListener('wheel', e => {
   rafId = requestAnimationFrame(inertia);
 }, { passive: false });
 
-/* ── 터치 ── */
 let touchPrevX = 0, touchPrevY = 0;
 document.addEventListener('touchstart', e => {
   touchPrevX = e.touches[0].clientX;
@@ -110,3 +95,43 @@ document.addEventListener('touchend', () => {
 });
 
 applyParallax();
+
+/* =====================================================
+   판 시스템
+   - 1분마다 4개 중 랜덤 2개를 화면에 뚝 표시
+   - 10초 후 뚝 사라짐
+   - 매번 다른 조합으로 나타남
+   ===================================================== */
+const panels = [
+  document.getElementById('panel-a'),
+  document.getElementById('panel-b'),
+  document.getElementById('panel-c'),
+  document.getElementById('panel-d'),
+];
+
+function shuffle(arr) {
+  /* Fisher-Yates 셔플 */
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function showPanels() {
+  /* 모두 숨기고 */
+  panels.forEach(p => p.style.display = 'none');
+
+  /* 4개 중 랜덤 2개 선택 */
+  const picked = shuffle(panels).slice(0, 2);
+  picked.forEach(p => p.style.display = 'block');
+
+  /* 10초 후 사라짐 */
+  setTimeout(() => {
+    picked.forEach(p => p.style.display = 'none');
+  }, 10000);
+}
+
+/* 1분마다 실행 */
+setInterval(showPanels, 60000);
