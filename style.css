@@ -1,62 +1,36 @@
-*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 
 body {
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-  background: #f0ede8;
-  font-family: 'Courier New', monospace;
+  width:100vw; height:100vh;
+  overflow:hidden;
+  background:#f0ede8;
+  font-family:'Courier New', monospace;
 }
 
-/* ── 아래 콘텐츠 레이어 (쪼개지면 드러남) ── */
-#under {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  /* 나중에 사진 등 콘텐츠 추가 */
-  background: #e8e4de;
+#viewport {
+  position:absolute;
+  inset:0;
+  overflow:hidden;
 }
 
-/* ── 배경 조각 레이어 ── */
-#shards {
-  position: fixed;
-  inset: 0;
-  z-index: 10;
-  pointer-events: none;
+#canvas {
+  position:absolute;
+  will-change:transform;
 }
 
-.shard {
-  position: absolute;
-  /* 배경 이미지는 main.js에서 동적으로 설정 */
-  background-image: url('images/bg/사문디_배경.jpg');
-  will-change: transform;
+.tile {
+  position:absolute;
+  background-image:url('images/bg/사문디_배경.jpg');
+  background-size:cover;
+  background-position:center;
 }
 
-/* ── 스크롤 이벤트 수신용 투명 레이어 ── */
-#scroll-layer {
-  position: fixed;
-  inset: 0;
-  z-index: 20;
-  cursor: grab;
-}
-
-#scroll-layer.dragging {
-  cursor: grabbing;
-}
-
-/* ── UI 힌트 ── */
 #ui-hint {
-  position: fixed;
-  bottom: 28px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 100;
-  font-size: 10px;
-  letter-spacing: 0.3em;
-  color: rgba(0, 0, 0, 0.3);
-  text-transform: uppercase;
-  pointer-events: none;
-  white-space: nowrap;
-  transition: opacity 1s ease;
+  position:fixed; bottom:28px; left:50%;
+  transform:translateX(-50%);
+  z-index:100; font-size:10px; letter-spacing:0.3em;
+  color:rgba(0,0,0,0.3); text-transform:uppercase;
+  pointer-events:none; white-space:nowrap;
+  transition:opacity 1s ease;
 }
-#ui-hint.hidden { opacity: 0; }
+#ui-hint.hidden { opacity:0; }
