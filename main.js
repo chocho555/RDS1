@@ -10,12 +10,12 @@ const hint     = document.getElementById('ui-hint');
 const IMG_W  = 4000;
 const IMG_H  = 2500;
 const SCALE  = 1.2;
-const TILE_W = IMG_W * SCALE;
-const TILE_H = IMG_H * SCALE;
+const TILE_W = IMG_W * SCALE;  /* 4800px */
+const TILE_H = IMG_H * SCALE;  /* 3000px */
 
+/* 배경 타일 세팅 */
 layerBg.style.width  = TILE_W * 3 + 'px';
 layerBg.style.height = TILE_H * 3 + 'px';
-
 document.querySelectorAll('.tile').forEach((tile, i) => {
   const col = i % 3, row = Math.floor(i / 3);
   tile.style.width  = TILE_W + 'px';
@@ -24,7 +24,7 @@ document.querySelectorAll('.tile').forEach((tile, i) => {
   tile.style.top    = row * TILE_H + 'px';
 });
 
-/* 중경 레이어 크기 */
+/* 중경 레이어 크기 = 타일 1장 */
 layerMid.style.width  = TILE_W + 'px';
 layerMid.style.height = TILE_H + 'px';
 
@@ -37,13 +37,27 @@ let velX = 0, velY = 0;
 let rafId = null;
 let hintHidden = false;
 
+/*
+  무한 루프: modulo로 타일 1장 범위 안에서 순환
+  배경(3×3 타일)과 중경(1장, 반복) 모두 같은 방식으로 wrap
+*/
 function wrap(val, size) {
   return ((val % size) + size) % size - size;
 }
 
 function applyParallax() {
-  layerBg.style.transform  = `translate(${wrap(x * SPEED_BG,  TILE_W)}px, ${wrap(y * SPEED_BG,  TILE_H)}px)`;
-  layerMid.style.transform = `translate(${wrap(x * SPEED_MID, TILE_W)}px, ${wrap(y * SPEED_MID, TILE_H)}px)`;
+  /* 배경: 3×3 타일 무한 루프 */
+  const bgX = wrap(x * SPEED_BG,  TILE_W);
+  const bgY = wrap(y * SPEED_BG,  TILE_H);
+  layerBg.style.transform = `translate(${bgX}px, ${bgY}px)`;
+
+  /*
+    중경: 조각들이 배치된 레이어
+    패럴랙스 속도로 움직이되, 타일 크기만큼 wrap해서 무한 반복
+  */
+  const midX = wrap(x * SPEED_MID, TILE_W);
+  const midY = wrap(y * SPEED_MID, TILE_H);
+  layerMid.style.transform = `translate(${midX}px, ${midY}px)`;
 }
 
 function inertia() {
