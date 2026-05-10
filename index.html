@@ -11,49 +11,17 @@
   <div id="ui-hint">scroll to explore</div>
 
   <div id="viewport">
-    <div id="world">
-
-      <!-- 레이어 0: 배경 -->
-      <div class="layer" id="layer-bg">
-        <div class="tile" style="left:0%;       top:0%"></div>
-        <div class="tile" style="left:33.3334%; top:0%"></div>
-        <div class="tile" style="left:66.6667%; top:0%"></div>
-        <div class="tile" style="left:0%;       top:33.3334%"></div>
-        <div class="tile" style="left:33.3334%; top:33.3334%"></div>
-        <div class="tile" style="left:66.6667%; top:33.3334%"></div>
-        <div class="tile" style="left:0%;       top:66.6667%"></div>
-        <div class="tile" style="left:33.3334%; top:66.6667%"></div>
-        <div class="tile" style="left:66.6667%; top:66.6667%"></div>
-      </div>
-
-      <!-- 레이어 1: 슬라이드쇼 (canvas만 — img 태그 없음) -->
-      <div class="layer" id="layer-slideshow">
-        <div id="slideshow-wrap">
-          <canvas id="slideshow-canvas"></canvas>
-        </div>
-      </div>
-
-      <!-- 레이어 2: 전경 사진들 -->
-      <div class="layer" id="layer-fg">
-        <!--
-          사진 준비되면 아래 형식으로 추가하세요:
-          <div class="photo-item"
-               style="left:Xpx; top:Ypx; width:Wpx;"
-               data-title="제목"
-               data-desc="설명">
-            <img src="images/fg/파일명.png" draggable="false" />
-          </div>
-        -->
-      </div>
-
+    <div id="canvas">
+      <div class="tile" style="left:0%;       top:0%"></div>
+      <div class="tile" style="left:33.3334%; top:0%"></div>
+      <div class="tile" style="left:66.6667%; top:0%"></div>
+      <div class="tile" style="left:0%;       top:33.3334%"></div>
+      <div class="tile" style="left:33.3334%; top:33.3334%"></div>
+      <div class="tile" style="left:66.6667%; top:33.3334%"></div>
+      <div class="tile" style="left:0%;       top:66.6667%"></div>
+      <div class="tile" style="left:33.3334%; top:66.6667%"></div>
+      <div class="tile" style="left:66.6667%; top:66.6667%"></div>
     </div>
-  </div>
-
-  <!-- 팝업 -->
-  <div id="popup">
-    <button id="popup-close">×</button>
-    <p id="popup-title"></p>
-    <p id="popup-desc"></p>
   </div>
 
   <script src="main.js"></script>
