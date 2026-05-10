@@ -10,14 +10,19 @@
 
   <div id="ui-hint">scroll to explore</div>
 
-  <!-- 레이어 0: 아래 콘텐츠 (나중에 사진 등 추가) -->
-  <div id="under"></div>
-
-  <!-- 레이어 1: 배경 이미지 조각들 (드래그 시 쪼개짐) -->
-  <div id="shards"></div>
-
-  <!-- 레이어 2: 무한 스크롤 컨트롤용 (투명, 이벤트만 받음) -->
-  <div id="scroll-layer"></div>
+  <div id="viewport">
+    <div id="canvas">
+      <div class="tile" style="left:0%;       top:0%"></div>
+      <div class="tile" style="left:33.3334%; top:0%"></div>
+      <div class="tile" style="left:66.6667%; top:0%"></div>
+      <div class="tile" style="left:0%;       top:33.3334%"></div>
+      <div class="tile" style="left:33.3334%; top:33.3334%"></div>
+      <div class="tile" style="left:66.6667%; top:33.3334%"></div>
+      <div class="tile" style="left:0%;       top:66.6667%"></div>
+      <div class="tile" style="left:33.3334%; top:66.6667%"></div>
+      <div class="tile" style="left:66.6667%; top:66.6667%"></div>
+    </div>
+  </div>
 
   <script src="main.js"></script>
 </body>
