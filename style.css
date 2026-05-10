@@ -1,36 +1,51 @@
-*, *::before, *::after {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
   background: #f0ede8;
-  cursor: grab;
-  user-select: none;
   font-family: 'Courier New', monospace;
 }
 
-body.dragging {
-  cursor: grabbing;
-}
-
-#scene {
+/* ── 무한 스크롤 배경 레이어 ── */
+#viewport {
   position: absolute;
   inset: 0;
+  overflow: hidden;
+  pointer-events: none; /* 드래그 이벤트는 body가 받음 */
 }
 
-.piece {
+#canvas {
+  position: absolute;
+  will-change: transform;
+}
+
+.tile {
+  position: absolute;
+  background-image: url('images/bg/사문디_배경.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+/* ── 패럴랙스 조각 레이어 ── */
+#shards {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.shard {
   position: absolute;
   background-image: url('images/bg/사문디_배경.jpg');
   background-size: cover;
   will-change: transform;
+  transition: transform 0.05s linear;
 }
 
-#hint {
+/* ── UI 힌트 ── */
+#ui-hint {
   position: fixed;
   bottom: 28px;
   left: 50%;
@@ -45,6 +60,4 @@ body.dragging {
   transition: opacity 1s ease;
 }
 
-#hint.hidden {
-  opacity: 0;
-}
+#ui-hint.hidden { opacity: 0; }
