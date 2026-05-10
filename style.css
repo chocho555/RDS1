@@ -13,10 +13,15 @@ body {
   overflow:hidden;
 }
 
-#canvas {
+/* ── 레이어 공통 ── */
+#layer-bg, #layer-mid {
   position:absolute;
+  top:0; left:0;
   will-change:transform;
 }
+
+/* ── 배경 타일 ── */
+#layer-bg { z-index:1; }
 
 .tile {
   position:absolute;
@@ -25,6 +30,18 @@ body {
   background-position:center;
 }
 
+/* ── 중경 타일 (요소2) ── */
+#layer-mid { z-index:2; }
+
+.mid-tile {
+  position:absolute;
+  background-image:url('images/요소2.png');
+  background-size:cover;
+  background-position:center;
+  /* 검정이 투명 처리됐으므로 배경이 비침 */
+}
+
+/* ── UI ── */
 #ui-hint {
   position:fixed; bottom:28px; left:50%;
   transform:translateX(-50%);
