@@ -2,14 +2,10 @@
    설정
 ═══════════════════════════════════════════════════════════════ */
 
-const BG_IMAGE = 'images/bg/사문디_배경.jpg';
+const BG_IMAGE   = 'images/bg/사문디_배경.jpg';
+const IMG_W      = 4000;
+const IMG_H      = 2500;
 
-/*
-  조각 정의: 첨부 이미지의 직사각형 구조를 비율(0~1)로 표현
-  x, y  : 화면 기준 좌상단 위치 비율
-  w, h  : 화면 기준 크기 비율
-  speed : 드래그 시 이동 속도 계수 (클수록 더 많이 벌어짐)
-*/
 const SHARD_DEFS = [
   { x:0.00, y:0.00, w:0.06, h:0.30, speed: 0.6  },
   { x:0.10, y:0.00, w:0.05, h:0.22, speed: 1.4  },
@@ -43,18 +39,41 @@ const SHARD_DEFS = [
 ];
 
 /* ═══════════════════════════════════════════════════════════════
+   화면에 이미지를 cover로 맞출 때의 실제 렌더 크기 계산
+   → 조각들의 backgroundSize / backgroundPosition 기준
+═══════════════════════════════════════════════════════════════ */
+
+function getCoverSize(vw, vh) {
+  const imgRatio    = IMG_W / IMG_H;
+  const screenRatio = vw / vh;
+  let renderW, renderH;
+  if (screenRatio > imgRatio) {
+    renderW = vw;
+    renderH = vw / imgRatio;
+  } else {
+    renderH = vh;
+    renderW = vh * imgRatio;
+  }
+  const offsetX = (vw - renderW) / 2;
+  const offsetY = (vh - renderH) / 2;
+  return { renderW, renderH, offsetX, offsetY };
+}
+
+/* ═══════════════════════════════════════════════════════════════
    조각 생성
 ═══════════════════════════════════════════════════════════════ */
 
-const shardsEl   = document.getElementById('shards');
+const shardsEl    = document.getElementById('shards');
 const scrollLayer = document.getElementById('scroll-layer');
 const hint        = document.getElementById('ui-hint');
 
-let shards = []; // { el, ox, oy, speed }
+let shards = [];
 
 function buildShards() {
-  const W = window.innerWidth;
-  const H = window.innerHeight;
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const { renderW, renderH, offsetX, offsetY } = getCoverSize(vw, vh);
+
   shardsEl.innerHTML = '';
   shards = [];
 
@@ -62,23 +81,25 @@ function buildShards() {
     const el = document.createElement('div');
     el.className = 'shard';
 
-    const px = def.x * W;
-    const py = def.y * H;
-    const pw = def.w * W;
-    const ph = def.h * H;
+    /* 조각 위치/크기: 화면 기준 비율 */
+    const px = def.x * vw;
+    const py = def.y * vh;
+    const pw = def.w * vw;
+    const ph = def.h * vh;
 
     el.style.left   = px + 'px';
     el.style.top    = py + 'px';
     el.style.width  = pw + 'px';
     el.style.height = ph + 'px';
 
-    /* 배경을 화면 전체 기준으로 정렬해서 조각들이 합쳐지면 온전한 이미지가 됨 */
+    /* backgroundSize: cover 기준 렌더 크기 */
     el.style.backgroundImage    = `url('${BG_IMAGE}')`;
-    el.style.backgroundSize     = `${W}px ${H}px`;
-    el.style.backgroundPosition = `-${px}px -${py}px`;
+    el.style.backgroundSize     = `${renderW}px ${renderH}px`;
+    /* backgroundPosition: cover 오프셋 + 조각 위치 보정 */
+    el.style.backgroundPosition = `${offsetX - px}px ${offsetY - py}px`;
 
     shardsEl.appendChild(el);
-    shards.push({ el, ox: px, oy: py, speed: def.speed });
+    shards.push({ el, px, py, speed: def.speed, offsetX, offsetY, renderW, renderH });
   });
 }
 
@@ -86,7 +107,6 @@ buildShards();
 
 /* ═══════════════════════════════════════════════════════════════
    드래그 → 조각 쪼개짐
-   (scroll-layer 위에서 mousedown 감지)
 ═══════════════════════════════════════════════════════════════ */
 
 let isDragging  = false;
@@ -97,16 +117,17 @@ let currentOffY = 0;
 let returnRaf   = null;
 
 function applyShards(ox, oy) {
-  shards.forEach(({ el, speed, ox: origX, oy: origY }) => {
-    const dx = ox * speed;
-    const dy = oy * speed;
-    el.style.transform          = `translate(${dx}px, ${dy}px)`;
-    el.style.backgroundPosition = `${-(origX - dx)}px ${-(origY - dy)}px`;
+  shards.forEach(s => {
+    const dx = ox * s.speed;
+    const dy = oy * s.speed;
+    s.el.style.transform = `translate(${dx}px, ${dy}px)`;
+    /* 배경도 조각과 함께 이동해서 이미지가 잘리지 않게 */
+    s.el.style.backgroundPosition =
+      `${s.offsetX - s.px + dx + bgX}px ${s.offsetY - s.py + dy + bgY}px`;
   });
 }
 
 function returnToOrigin() {
-  /* 부드럽게 원위치 복귀 */
   const ease = 0.12;
   currentOffX *= (1 - ease);
   currentOffY *= (1 - ease);
@@ -145,13 +166,8 @@ window.addEventListener('mouseup', () => {
 });
 
 /* ═══════════════════════════════════════════════════════════════
-   휠 스크롤 → 배경 이미지 오프셋 이동 (무한 탐색)
-   조각들의 backgroundPosition을 함께 이동시켜
-   마치 배경을 탐색하는 것처럼 보이게 함
+   휠 스크롤 → 배경 탐색
 ═══════════════════════════════════════════════════════════════ */
-
-const IMG_W = 4000;
-const IMG_H = 2500;
 
 let bgX = 0;
 let bgY = 0;
@@ -165,20 +181,22 @@ function hideHint() {
 }
 
 function updateBgPositions() {
-  /* 각 조각의 배경 위치를 bgX, bgY 오프셋 + 드래그 오프셋으로 계산 */
-  shards.forEach(({ el, ox: origX, oy: origY, speed }) => {
-    const dragDx = currentOffX * speed;
-    const dragDy = currentOffY * speed;
-    el.style.backgroundPosition =
-      `${-(origX - dragDx) + bgX}px ${-(origY - dragDy) + bgY}px`;
+  shards.forEach(s => {
+    const dx = currentOffX * s.speed;
+    const dy = currentOffY * s.speed;
+    s.el.style.backgroundPosition =
+      `${s.offsetX - s.px + dx + bgX}px ${s.offsetY - s.py + dy + bgY}px`;
   });
 }
 
 function wrapBg() {
-  if (bgX >  IMG_W / 2) bgX -= IMG_W;
-  if (bgX < -IMG_W / 2) bgX += IMG_W;
-  if (bgY >  IMG_H / 2) bgY -= IMG_H;
-  if (bgY < -IMG_H / 2) bgY += IMG_H;
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const { renderW, renderH } = getCoverSize(vw, vh);
+  if (bgX >  renderW / 2) bgX -= renderW;
+  if (bgX < -renderW / 2) bgX += renderW;
+  if (bgY >  renderH / 2) bgY -= renderH;
+  if (bgY < -renderH / 2) bgY += renderH;
 }
 
 function scrollInertia() {
@@ -218,7 +236,7 @@ window.addEventListener('wheel', e => {
 }, { passive: false });
 
 /* ═══════════════════════════════════════════════════════════════
-   리사이즈 대응
+   리사이즈
 ═══════════════════════════════════════════════════════════════ */
 window.addEventListener('resize', () => {
   buildShards();
