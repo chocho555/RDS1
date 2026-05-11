@@ -172,8 +172,6 @@ applyParallax();
 /* ── 팝업 시스템 (1번 클릭: title, 2번 클릭: desc) ── */
 const clickState = new Map();  // id → 'title' | 'desc'
 const piecePopup = new Map();  // id → 현재 띄워진 popup 엘리먼트
-const clickedIds = new Set();  // 클릭된 조각 id 모음
-const TOTAL_PIECES = 39;
 
 document.addEventListener('click', e => {
   const piece = e.target.closest('.piece');
@@ -189,13 +187,6 @@ document.addEventListener('click', e => {
       text = title;
       clickState.set(id, 'title');
 
-      /* 처음 클릭한 조각이면 집합에 추가 */
-      clickedIds.add(id);
-
-      /* 39개 모두 클릭 완료 시 reward 페이지로 이동 */
-      if (clickedIds.size >= TOTAL_PIECES) {
-        setTimeout(() => { window.location.href = 'reward.html'; }, 300);
-      }
 
     } else if (state === 'title' && desc) {
       text = desc;
