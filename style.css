@@ -107,4 +107,6 @@ body {
   line-height: 1.5;
   letter-spacing: -0.06em;
   margin: 0;
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
