@@ -170,7 +170,8 @@ document.addEventListener('touchend', () => {
 applyParallax();
 
 /* ── 팝업 시스템 (1번 클릭: title, 2번 클릭: desc) ── */
-const clickState = new Map();
+const clickState = new Map();  // id → 'title' | 'desc'
+const piecePopup = new Map();  // id → 현재 띄워진 popup 엘리먼트
 
 document.addEventListener('click', e => {
   const piece = e.target.closest('.piece');
@@ -182,17 +183,24 @@ document.addEventListener('click', e => {
     const state = clickState.get(id);
     let text = '';
 
-    if (!state || state === 'desc') {
+    if (!state) {
+      /* 첫 클릭: title */
       text = title;
-      clickState.set(id, desc ? 'title' : 'done');
+      clickState.set(id, 'title');
     } else if (state === 'title' && desc) {
+      /* 두 번째 클릭: desc */
       text = desc;
       clickState.set(id, 'desc');
     } else {
+      /* desc 없거나 이미 desc까지 본 경우 → 아무것도 안 함 */
       return;
     }
 
     if (!text) return;
+
+    /* 같은 조각의 이전 팝업 제거 */
+    const prev = piecePopup.get(id);
+    if (prev) prev.remove();
 
     const rect = piece.getBoundingClientRect();
     let left = rect.right + 12;
@@ -202,6 +210,9 @@ document.addEventListener('click', e => {
     if (left < 8) left = 8;
     if (top  < 8) top  = 8;
 
+    /* desc는 title보다 살짝 아래에 배치 */
+    if (state === 'title') top += 30;
+
     const popup = document.createElement('div');
     popup.className = 'popup';
     popup.innerHTML = `<p class="popup-text">${text.replace(/\n/g, '<br>')}</p>`;
@@ -209,11 +220,20 @@ document.addEventListener('click', e => {
     popup.style.top  = top  + 'px';
     document.body.appendChild(popup);
 
-    setTimeout(() => popup.remove(), 20000);
+    piecePopup.set(id, popup);
+    const timer = setTimeout(() => {
+      popup.remove();
+      piecePopup.delete(id);
+    }, 20000);
+    popup.dataset.timer = timer;
 
   } else {
-    document.querySelectorAll('.popup').forEach(p => p.remove());
+    document.querySelectorAll('.popup').forEach(p => {
+      clearTimeout(p.dataset.timer);
+      p.remove();
+    });
     clickState.clear();
+    piecePopup.clear();
   }
 });
 
