@@ -101,10 +101,10 @@ body {
 }
 .popup-text {
   font-family: 'AppleSDGothicNeo', sans-serif;
-  font-size: 24px;
-  font-weight: 600;
+  font-size: 18px;
+  font-weight: normal;
   color: #ffffff;
   line-height: 1.5;
-  letter-spacing: -0.05em;
+  letter-spacing: -0.06em;
   margin: 0;
 }
