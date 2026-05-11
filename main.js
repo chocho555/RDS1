@@ -172,6 +172,19 @@ applyParallax();
 /* ── 팝업 시스템 (1번 클릭: title, 2번 클릭: desc) ── */
 const clickState = new Map();  // id → 'title' | 'desc'
 const piecePopup = new Map();  // id → 현재 띄워진 popup 엘리먼트
+const clickedIds = new Set();  // 클릭된 조각 id 모음
+const TOTAL_PIECES = 39;
+const DOWNLOAD_IMAGES = Array.from({length: 50}, (_, i) => `images/download/${String(i+1).padStart(3, '0')}.jpg`);
+
+function triggerRandomDownload() {
+  const url = DOWNLOAD_IMAGES[Math.floor(Math.random() * DOWNLOAD_IMAGES.length)];
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = url.split('/').pop();
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
 
 document.addEventListener('click', e => {
   const piece = e.target.closest('.piece');
@@ -184,21 +197,27 @@ document.addEventListener('click', e => {
     let text = '';
 
     if (!state) {
-      /* 첫 클릭: title */
       text = title;
       clickState.set(id, 'title');
+
+      /* 처음 클릭한 조각이면 집합에 추가 */
+      clickedIds.add(id);
+
+      /* 39개 모두 클릭 완료 시 랜덤 다운로드 */
+      if (clickedIds.size >= TOTAL_PIECES) {
+        setTimeout(triggerRandomDownload, 300);
+        clickedIds.clear();
+      }
+
     } else if (state === 'title' && desc) {
-      /* 두 번째 클릭: desc */
       text = desc;
       clickState.set(id, 'desc');
     } else {
-      /* desc 없거나 이미 desc까지 본 경우 → 아무것도 안 함 */
       return;
     }
 
     if (!text) return;
 
-    /* 같은 조각의 이전 팝업 제거 */
     const prev = piecePopup.get(id);
     if (prev) prev.remove();
 
@@ -210,7 +229,6 @@ document.addEventListener('click', e => {
     if (left < 8) left = 8;
     if (top  < 8) top  = 8;
 
-    /* desc는 title보다 살짝 아래에 배치 */
     if (state === 'title') top += 30;
 
     const popup = document.createElement('div');
@@ -235,6 +253,8 @@ document.addEventListener('click', e => {
     clickState.clear();
     piecePopup.clear();
   }
+});
+
 });
 
 /* ── 판 시스템 ── */
