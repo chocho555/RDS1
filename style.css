@@ -62,7 +62,21 @@ body {
 #panel-c { background-image: url('images/가림막3.png'); }
 #panel-d { background-image: url('images/가림막4.png'); }
 
-/* ── UI 힌트 ── */
+/* ── 홈 버튼 ── */
+#home-btn {
+  position: fixed;
+  top: 3vh;
+  right: 3vw;
+  width: 36px;
+  z-index: 200;
+  cursor: pointer;
+}
+#home-btn img {
+  width: 100%;
+  height: auto;
+  display: block;
+  mix-blend-mode: multiply;
+}
 #ui-hint {
   position:fixed; bottom:28px; left:50%;
   transform:translateX(-50%);
