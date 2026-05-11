@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portfolio</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: #ffffff;
+    }
+
+    #slideshow {
+      position: absolute;
+      top: 4vh;
+      left: 4vw;
+      width: 120px;
+      height: 120px;
+    }
+
+    #slideshow img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      opacity: 0;
+      transition: opacity 0.8s ease;
+    }
+
+    #slideshow img.active {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="slideshow"></div>
+
+  <script>
+    const TOTAL = 50;
+    const INTERVAL = 5000;
+    const container = document.getElementById('slideshow');
+
+    /* 이미지 엘리먼트 생성 */
+    const imgs = Array.from({length: TOTAL}, (_, i) => {
+      const img = document.createElement('img');
+      img.src = `images/reward/${String(i + 1).padStart(3, '0')}.jpg`;
+      img.draggable = false;
+      container.appendChild(img);
+      return img;
+    });
+
+    let current = 0;
+    imgs[0].classList.add('active');
+
+    setInterval(() => {
+      imgs[current].classList.remove('active');
+      current = (current + 1) % TOTAL;
+      imgs[current].classList.add('active');
+    }, INTERVAL);
+  </script>
+</body>
+</html>
