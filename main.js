@@ -234,8 +234,6 @@ document.addEventListener('click', e => {
   }
 });
 
-});
-
 /* ── 판 시스템 ── */
 const panels = [
   document.getElementById('panel-a'),
