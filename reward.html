@@ -31,12 +31,11 @@
       width: 100%;
       height: 100%;
       object-fit: contain;
-      opacity: 0;
-      transition: opacity 0.8s ease;
+      display: none;
     }
 
     #slideshow img.active {
-      opacity: 1;
+      display: block;
     }
 
     /* 페이지 전환 오버레이 */
@@ -62,7 +61,7 @@
 
   <script>
     const TOTAL    = 50;
-    const INTERVAL = 5000;
+    const INTERVAL = 2500;
     const container = document.getElementById('slideshow');
     const overlay   = document.getElementById('overlay');
 
