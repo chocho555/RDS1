@@ -12,6 +12,8 @@
       height: 100vh;
       overflow: hidden;
       background: #ffffff;
+      opacity: 0;
+      transition: opacity 0.6s ease;
     }
 
     #slideshow {
@@ -63,6 +65,11 @@
     const INTERVAL = 5000;
     const container = document.getElementById('slideshow');
     const overlay   = document.getElementById('overlay');
+
+    /* 페이지 진입 시 페이드인 */
+    window.addEventListener('load', () => {
+      document.body.style.opacity = '1';
+    });
 
     /* 이미지 엘리먼트 생성 */
     const imgs = Array.from({length: TOTAL}, (_, i) => {
