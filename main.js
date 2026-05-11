@@ -186,7 +186,7 @@ document.addEventListener('click', e => {
     document.body.appendChild(popup);
 
     /* 30초 후 자동 제거 */
-    setTimeout(() => popup.remove(), 30000);
+    setTimeout(() => popup.remove(), 20000);
 
   } else {
     /* 빈 곳 클릭 시 모든 팝업 제거 */
