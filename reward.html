@@ -36,16 +36,33 @@
     #slideshow img.active {
       opacity: 1;
     }
+
+    /* 페이지 전환 오버레이 */
+    #overlay {
+      position: fixed;
+      inset: 0;
+      background: #000000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.6s ease;
+      z-index: 99;
+    }
+    #overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
   </style>
 </head>
 <body>
 
+  <div id="overlay"></div>
   <div id="slideshow"></div>
 
   <script>
-    const TOTAL = 50;
+    const TOTAL    = 50;
     const INTERVAL = 5000;
     const container = document.getElementById('slideshow');
+    const overlay   = document.getElementById('overlay');
 
     /* 이미지 엘리먼트 생성 */
     const imgs = Array.from({length: TOTAL}, (_, i) => {
@@ -59,9 +76,22 @@
     let current = 0;
     imgs[0].classList.add('active');
 
-    setInterval(() => {
+    const timer = setInterval(() => {
       imgs[current].classList.remove('active');
-      current = (current + 1) % TOTAL;
+      current++;
+
+      if (current >= TOTAL) {
+        /* 마지막 이미지까지 다 보여줬으면 main으로 이동 */
+        clearInterval(timer);
+        setTimeout(() => {
+          overlay.classList.add('active');
+          setTimeout(() => {
+            window.location.href = 'main.html';
+          }, 650);
+        }, INTERVAL);
+        return;
+      }
+
       imgs[current].classList.add('active');
     }, INTERVAL);
   </script>
