@@ -20,6 +20,11 @@
 
   <div id="ui-hint">scroll to explore</div>
 
+  <!-- 우측 상단 홈 버튼 -->
+  <div id="home-btn" title="home">
+    <img src="images/landing.png" alt="home" draggable="false" />
+  </div>
+
   <div id="viewport">
     <div id="layer-bg">
       <div class="tile" style="left:0%;       top:0%"></div>
@@ -89,6 +94,10 @@
       const fadeIn = document.getElementById('fade-in');
       fadeIn.style.opacity = '0';
       setTimeout(() => fadeIn.remove(), 900);
+
+      document.getElementById('home-btn').addEventListener('click', () => {
+        window.location.href = 'index.html';
+      });
     });
   </script>
 </body>
