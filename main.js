@@ -62,7 +62,7 @@ const PIECES = [
   {id:35, x:2615, y:1115, w:1103, h:734,  title:'판', desc:''},
   {id:36, x:1661, y:628,  w:419,  h:281,  title:'', desc:'물병들이 엮여서'},
   {id:37, x:2396, y:2720, w:416,  h:278,  title:'', desc:'가림판 위에 표시해둔 숫자들'},
-  {id:38, x:1096, y:802,  w:402,  h:604,  title:'', desc:'옥상에 위치한 자전거와 의자,\n바깥 풍경을 보며 운동하고 쉴 수 있을 것 같다'},
+  {id:38, x:1096, y:802,  w:402,  h:604,  title:'명수대 아파트 옥상의 실내자전거', desc:''},
   {id:39, x:3995, y:60,   w:248,  h:370,  title:'중정과 복도', desc:''},
 ];
 
@@ -172,6 +172,8 @@ applyParallax();
 /* ── 팝업 시스템 (1번 클릭: title, 2번 클릭: desc) ── */
 const clickState = new Map();  // id → 'title' | 'desc'
 const piecePopup = new Map();  // id → 현재 띄워진 popup 엘리먼트
+const clickedIds = new Set();  // 클릭된 조각 id 모음
+const TOTAL_PIECES = 39;
 
 document.addEventListener('click', e => {
   const piece = e.target.closest('.piece');
@@ -184,21 +186,26 @@ document.addEventListener('click', e => {
     let text = '';
 
     if (!state) {
-      /* 첫 클릭: title */
       text = title;
       clickState.set(id, 'title');
+
+      /* 처음 클릭한 조각이면 집합에 추가 */
+      clickedIds.add(id);
+
+      /* 39개 모두 클릭 완료 시 reward 페이지로 이동 */
+      if (clickedIds.size >= TOTAL_PIECES) {
+        setTimeout(() => { window.location.href = 'reward.html'; }, 300);
+      }
+
     } else if (state === 'title' && desc) {
-      /* 두 번째 클릭: desc */
       text = desc;
       clickState.set(id, 'desc');
     } else {
-      /* desc 없거나 이미 desc까지 본 경우 → 아무것도 안 함 */
       return;
     }
 
     if (!text) return;
 
-    /* 같은 조각의 이전 팝업 제거 */
     const prev = piecePopup.get(id);
     if (prev) prev.remove();
 
@@ -210,7 +217,6 @@ document.addEventListener('click', e => {
     if (left < 8) left = 8;
     if (top  < 8) top  = 8;
 
-    /* desc는 title보다 살짝 아래에 배치 */
     if (state === 'title') top += 30;
 
     const popup = document.createElement('div');
@@ -235,6 +241,8 @@ document.addEventListener('click', e => {
     clickState.clear();
     piecePopup.clear();
   }
+});
+
 });
 
 /* ── 판 시스템 ── */
