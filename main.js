@@ -184,8 +184,7 @@ document.addEventListener('click', e => {
     const popup = document.createElement('div');
     popup.className = 'popup';
     const text = [piece.dataset.title, piece.dataset.desc].filter(Boolean).join('\n');
-    const fontSize = text.replace(/\n/g, '').length <= 6 ? '30px' : '18px';
-    popup.innerHTML = `<p class="popup-text" style="font-size:${fontSize}">${text.replace(/\n/g, '<br>')}</p>`;
+    popup.innerHTML = `<p class="popup-text">${text.replace(/\n/g, '<br>')}</p>`;
     popup.style.left = left + 'px';
     popup.style.top  = top  + 'px';
     document.body.appendChild(popup);
