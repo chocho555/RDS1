@@ -174,17 +174,6 @@ const clickState = new Map();  // id → 'title' | 'desc'
 const piecePopup = new Map();  // id → 현재 띄워진 popup 엘리먼트
 const clickedIds = new Set();  // 클릭된 조각 id 모음
 const TOTAL_PIECES = 39;
-const DOWNLOAD_IMAGES = Array.from({length: 50}, (_, i) => `images/download/${String(i+1).padStart(3, '0')}.jpg`);
-
-function triggerRandomDownload() {
-  const url = DOWNLOAD_IMAGES[Math.floor(Math.random() * DOWNLOAD_IMAGES.length)];
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = url.split('/').pop();
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-}
 
 document.addEventListener('click', e => {
   const piece = e.target.closest('.piece');
@@ -203,10 +192,9 @@ document.addEventListener('click', e => {
       /* 처음 클릭한 조각이면 집합에 추가 */
       clickedIds.add(id);
 
-      /* 39개 모두 클릭 완료 시 랜덤 다운로드 */
+      /* 39개 모두 클릭 완료 시 reward 페이지로 이동 */
       if (clickedIds.size >= TOTAL_PIECES) {
-        setTimeout(triggerRandomDownload, 300);
-        clickedIds.clear();
+        setTimeout(() => { window.location.href = 'reward.html'; }, 300);
       }
 
     } else if (state === 'title' && desc) {
