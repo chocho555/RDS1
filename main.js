@@ -210,6 +210,24 @@ document.addEventListener('click', e => {
 
     if (state === 'title') top += 30;
 
+    /* 기존 팝업들과 겹치지 않도록 위치 조정 */
+    const POPUP_H = 80;
+    let attempts = 0;
+    let overlap = true;
+    while (overlap && attempts < 20) {
+      overlap = false;
+      document.querySelectorAll('.popup').forEach(p => {
+        const pt = parseInt(p.style.top);
+        const pl = parseInt(p.style.left);
+        if (Math.abs(top - pt) < POPUP_H && Math.abs(left - pl) < 280) {
+          top = pt + POPUP_H + 8;
+          overlap = true;
+        }
+      });
+      attempts++;
+    }
+    if (top + POPUP_H > window.innerHeight) top = window.innerHeight - POPUP_H - 8;
+
     const popup = document.createElement('div');
     popup.className = 'popup';
     popup.innerHTML = `<p class="popup-text">${text.replace(/\n/g, '<br>')}</p>`;
