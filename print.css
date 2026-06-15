@@ -1,139 +1,120 @@
-*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+@page {
+  size: A4 landscape;
+  margin: 0;
+}
+
+* {
+  box-sizing: border-box;
+}
 
 html,
 body {
-  width:100%;
-  min-height:100%;
-  background:#000000;
-  font-family:'Courier New', monospace;
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+  background: #000000;
+  color: #ffffff;
+  font-family: Arial, sans-serif;
 }
 
 body {
-  opacity:0;
-  transition:opacity 0.35s ease;
+  opacity: 0;
+  transition: opacity 0.25s ease;
 }
 
 body.ready {
-  opacity:1;
+  opacity: 1;
 }
 
 #print-pages {
-  width:100%;
-  background:#000000;
+  width: 100%;
+  background: #000000;
 }
 
 .print-page {
-  position:relative;
-  width:100vw;
-  height:100vh;
-  overflow:hidden;
-  background:#000000;
-  page-break-after:always;
-  break-after:page;
+  width: 297mm;
+  height: 210mm;
+  overflow: hidden;
+  background: #000000;
+  page-break-after: always;
+  break-after: page;
+  position: relative;
 }
 
 .print-page:last-child {
-  page-break-after:auto;
-  break-after:auto;
+  page-break-after: auto;
+  break-after: auto;
 }
 
-.print-layer-bg,
-.print-layer-elements {
-  position:absolute;
-  top:0;
-  left:0;
-  will-change:transform;
+.print-frame {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000000;
 }
 
-.print-layer-bg { z-index:1; }
-.print-layer-elements { z-index:2; pointer-events:none; }
-
-.print-tile,
-.print-element-tile {
-  position:absolute;
-  background-size:100% 100%;
-  background-repeat:no-repeat;
-  background-position:center;
+.print-capture {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: center center;
+  background: #000000;
 }
 
-.print-tile {
-  background-image:url('images/bg/사문디_배경.jpg');
+.print-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.print-element-tile {
-  background-image:url('images/elements.png');
+.print-empty-message {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.85);
 }
 
-.print-panel {
-  display:none;
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  z-index:5;
-  pointer-events:none;
-  background-size:100% 100%;
-  background-repeat:no-repeat;
-  background-position:center;
-}
+@media screen {
+  body {
+    display: flex;
+    justify-content: center;
+    padding: 24px 0;
+  }
 
-.print-panel.active {
-  display:block;
-}
+  #print-pages {
+    width: 297mm;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
 
-.print-panel[data-panel="a"] { background-image:url('images/가림막1.png'); }
-.print-panel[data-panel="b"] { background-image:url('images/가림막2.png'); }
-.print-panel[data-panel="c"] { background-image:url('images/가림막3.png'); }
-.print-panel[data-panel="d"] { background-image:url('images/가림막4.png'); }
-
-@page {
-  size:A4 landscape;
-  margin:0;
+  .print-page {
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.08),
+      0 20px 40px rgba(0, 0, 0, 0.35);
+  }
 }
 
 @media print {
   html,
   body {
-    width:297mm;
-    min-height:210mm;
-    background:#000000;
-    -webkit-print-color-adjust:exact;
-    print-color-adjust:exact;
+    width: 297mm;
+    min-height: 210mm;
+    background: #000000;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 
-  #print-pages {
-    width:297mm;
-    background:#000000;
-    -webkit-print-color-adjust:exact;
-    print-color-adjust:exact;
+  body {
+    display: block;
+    padding: 0;
   }
 
-  .print-page {
-    width:297mm;
-    height:210mm;
-    overflow:hidden;
-    background:#000000;
-    page-break-after:always;
-    break-after:page;
-    -webkit-print-color-adjust:exact;
-    print-color-adjust:exact;
-  }
-
-  .print-page:last-child {
-    page-break-after:auto;
-    break-after:auto;
-  }
-
-  .print-layer-bg,
-  .print-layer-elements,
-  .print-tile,
-  .print-element-tile,
-  .print-panel {
-    -webkit-print-color-adjust:exact;
-    print-color-adjust:exact;
-  }
-
-  .print-panel.active {
-    display:block !important;
+  #print-pages,
+  .print-page,
+  .print-frame,
+  .print-capture {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 }
