@@ -25,39 +25,9 @@
     }
 
     #slideshow img {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      display: none;
-    }
 
-    #slideshow img.active {
-      display: block;
-    }
 
-    /* 페이지 전환 오버레이 */
-    #overlay {
-      position: fixed;
-      inset: 0;
-      background: #000000;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.6s ease;
-      z-index: 99;
-    }
-    #overlay.active {
-      opacity: 1;
-      pointer-events: all;
-    }
-  </style>
-</head>
-<body>
-
-  <div id="overlay"></div>
-  <div id="slideshow"></div>
+@@ -61,7 +61,7 @@
 
   <script>
     const TOTAL    = 50;
@@ -65,41 +35,4 @@
     const container = document.getElementById('slideshow');
     const overlay   = document.getElementById('overlay');
 
-    /* 페이지 진입 시 페이드인 */
-    window.addEventListener('load', () => {
-      document.body.style.opacity = '1';
-    });
 
-    /* 이미지 엘리먼트 생성 */
-    const imgs = Array.from({length: TOTAL}, (_, i) => {
-      const img = document.createElement('img');
-      img.src = `images/reward/${String(i + 1).padStart(3, '0')}.jpg`;
-      img.draggable = false;
-      container.appendChild(img);
-      return img;
-    });
-
-    let current = 0;
-    imgs[0].classList.add('active');
-
-    const timer = setInterval(() => {
-      imgs[current].classList.remove('active');
-      current++;
-
-      if (current >= TOTAL) {
-        /* 마지막 이미지까지 다 보여줬으면 main으로 이동 */
-        clearInterval(timer);
-        setTimeout(() => {
-          overlay.classList.add('active');
-          setTimeout(() => {
-            window.location.href = 'main.html';
-          }, 650);
-        }, INTERVAL);
-        return;
-      }
-
-      imgs[current].classList.add('active');
-    }, INTERVAL);
-  </script>
-</body>
-</html>
