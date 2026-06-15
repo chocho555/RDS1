@@ -59,11 +59,7 @@
       setTimeout(() => fadeIn.remove(), 900);
 
       document.getElementById('home-btn').addEventListener('click', () => {
-        if (window.routeToPrintBeforeLeaving) {
-          window.routeToPrintBeforeLeaving('index.html');
-        } else {
-          window.location.href = 'index.html';
-        }
+        window.location.href = 'index.html';
       });
     });
   </script>
