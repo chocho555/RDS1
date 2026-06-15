@@ -115,7 +115,10 @@ for (let row = 0; row < 3; row++) {
    요소 이미지가 2000×1250에서 4800×3000으로 커져 보이므로,
    돌 위치도 같은 비율에 맞춘 좌표로 잡았다. */
 const PRINT_TRIGGER_RECTS = [
-  { x: 335, y: 2085, w: 150, h: 115 }
+  // elements.png 기준으로 왼쪽 아래 장판 이미지 안의 위쪽 돌.
+  // 실제 화면에서는 elements.png가 2.4배로 커져 보이므로,
+  // 클릭이 빗나가지 않도록 돌 주변까지 넉넉하게 잡았다.
+  { x: 175, y: 1970, w: 240, h: 210 }
 ];
 
 for (let row = 0; row < 3; row++) {
@@ -254,6 +257,7 @@ function openPrintPage() {
 document.addEventListener('pointerdown', e => {
   const piece = e.target.closest('.print-trigger');
   if (!piece) return;
+  e.preventDefault();
 
   longPressTarget = piece;
   longPressStartX = e.clientX;
@@ -264,7 +268,7 @@ document.addEventListener('pointerdown', e => {
     clearLongPress();
     openPrintPage();
   }, LONG_PRESS_MS);
-}, { passive: true });
+}, { passive: false });
 
 document.addEventListener('pointermove', e => {
   if (!longPressTimer) return;
@@ -283,6 +287,11 @@ document.addEventListener('click', e => {
   e.stopImmediatePropagation();
   suppressNextClick = false;
 }, true);
+
+// 돌을 길게 누를 때 브라우저 기본 메뉴가 뜨지 않도록 막음
+document.addEventListener('contextmenu', e => {
+  if (e.target.closest('.print-trigger')) e.preventDefault();
+});
 
 /* ── 팝업 시스템 ──
    현재 버전에서는 화면 위 글자가 뜨지 않도록 비활성화했다. */
