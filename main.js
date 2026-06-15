@@ -2,8 +2,9 @@
    main.js
    ===================================================== */
 
-const layerBg  = document.getElementById('layer-bg');
-const layerMid = document.getElementById('layer-mid');
+const layerBg       = document.getElementById('layer-bg');
+const layerElements = document.getElementById('layer-elements');
+const layerMid      = document.getElementById('layer-mid');
 const hint     = document.getElementById('ui-hint');
 
 const IMG_W  = 4000;
@@ -12,9 +13,13 @@ const SCALE  = 1.2;
 const TILE_W = IMG_W * SCALE;  /* 4800px */
 const TILE_H = IMG_H * SCALE;  /* 3000px */
 
+/* ── 레이어 크기 설정 (3×3 반복으로 무한 이동처럼 보이게 함) ── */
+[layerBg, layerElements, layerMid].forEach(layer => {
+  layer.style.width  = TILE_W * 3 + 'px';
+  layer.style.height = TILE_H * 3 + 'px';
+});
+
 /* ── 배경 타일 (3×3) ── */
-layerBg.style.width  = TILE_W * 3 + 'px';
-layerBg.style.height = TILE_H * 3 + 'px';
 document.querySelectorAll('.tile').forEach((tile, i) => {
   const col = i % 3, row = Math.floor(i / 3);
   tile.style.width  = TILE_W + 'px';
@@ -22,6 +27,20 @@ document.querySelectorAll('.tile').forEach((tile, i) => {
   tile.style.left   = col * TILE_W + 'px';
   tile.style.top    = row * TILE_H + 'px';
 });
+
+/* ── 요소 PNG 타일 (3×3)
+   요소 파일은 투명 PNG이므로 배경 위에 그대로 얹힘 */
+for (let row = 0; row < 3; row++) {
+  for (let col = 0; col < 3; col++) {
+    const tile = document.createElement('div');
+    tile.className = 'element-tile';
+    tile.style.width  = TILE_W + 'px';
+    tile.style.height = TILE_H + 'px';
+    tile.style.left   = col * TILE_W + 'px';
+    tile.style.top    = row * TILE_H + 'px';
+    layerElements.appendChild(tile);
+  }
+}
 
 /* ── 조각 데이터 ── */
 const PIECES = [
@@ -66,10 +85,7 @@ const PIECES = [
   {id:39, x:3995, y:60,   w:248,  h:370,  title:'중정과 복도', desc:''},
 ];
 
-/* ── 중경 레이어: 3×3 복제로 무한 루프 ── */
-layerMid.style.width  = TILE_W * 3 + 'px';
-layerMid.style.height = TILE_H * 3 + 'px';
-
+/* ── 클릭 영역 레이어: 3×3 복제로 무한 루프 ── */
 for (let row = 0; row < 3; row++) {
   for (let col = 0; col < 3; col++) {
     const offsetX = col * TILE_W;
@@ -86,23 +102,16 @@ for (let row = 0; row < 3; row++) {
       el.dataset.title = p.title;
       el.dataset.desc  = p.desc;
 
-      const img = document.createElement('img');
-      img.src = `images/조각/조각${p.id}.png`;
-      img.style.width      = TILE_W + 'px';
-      img.style.height     = TILE_H + 'px';
-      img.style.marginLeft = -p.x + 'px';
-      img.style.marginTop  = -p.y + 'px';
-      img.draggable = false;
-
-      el.appendChild(img);
+      // 실제 이미지는 #layer-elements의 elements.png에서 보여주고,
+      // 이 div는 팝업을 띄우기 위한 투명 클릭 영역만 담당한다.
       layerMid.appendChild(el);
     });
   }
 }
 
-/* ── 패럴랙스 ── */
-const SPEED_BG  = 0.2;
-const SPEED_MID = 0.6;
+/* ── 이동 속도 ──
+   배경과 요소를 같은 좌표계로 움직여야 요소가 배경 위에 얹힌 상태로 유지된다. */
+const SPEED_WORLD = 0.6;
 
 let x = 0, y = 0;
 let velX = 0, velY = 0;
@@ -114,8 +123,12 @@ function wrap(val, size) {
 }
 
 function applyParallax() {
-  layerBg.style.transform  = `translate(${wrap(x * SPEED_BG,  TILE_W)}px, ${wrap(y * SPEED_BG,  TILE_H)}px)`;
-  layerMid.style.transform = `translate(${wrap(x * SPEED_MID, TILE_W)}px, ${wrap(y * SPEED_MID, TILE_H)}px)`;
+  const tx = wrap(x * SPEED_WORLD, TILE_W);
+  const ty = wrap(y * SPEED_WORLD, TILE_H);
+
+  layerBg.style.transform       = `translate(${tx}px, ${ty}px)`;
+  layerElements.style.transform = `translate(${tx}px, ${ty}px)`;
+  layerMid.style.transform      = `translate(${tx}px, ${ty}px)`;
 }
 
 function inertia() {
