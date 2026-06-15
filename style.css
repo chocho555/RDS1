@@ -142,3 +142,8 @@ body {
   -webkit-user-select: none;
   user-select: none;
 }
+
+/* 돌 이동 영역이 다른 투명 클릭 영역에 묻히지 않도록 가장 위에 둠 */
+.print-trigger {
+  z-index: 50;
+}
