@@ -110,15 +110,28 @@ for (let row = 0; row < 3; row++) {
 }
 
 
-/* ── 오른쪽 위의 작은 돌 전용 길게 누르기 영역 ──
-   화면에는 보이지 않는 투명 영역이다.
-   요소 이미지가 2000×1250에서 4800×3000으로 커져 보이므로,
-   돌 위치도 같은 비율에 맞춘 좌표로 잡았다. */
+/* ── 오른쪽 위의 작은 돌 전용 이동 영역 ──
+   이전 버전은 돌 주변 좌표가 너무 작게 잡혀서 클릭이 빗나갈 수 있었다.
+   이번에는 elements.png 원본 좌표 기준으로 돌이 있는 작은 사진 전체를 넓게 잡고,
+   아래에서 TILE 크기에 맞춰 자동 변환한다. */
+const SOURCE_W = 2000;
+const SOURCE_H = 1250;
+const SRC_TO_TILE_X = TILE_W / SOURCE_W;
+const SRC_TO_TILE_Y = TILE_H / SOURCE_H;
+
+function srcRect(x, y, w, h) {
+  return {
+    x: x * SRC_TO_TILE_X,
+    y: y * SRC_TO_TILE_Y,
+    w: w * SRC_TO_TILE_X,
+    h: h * SRC_TO_TILE_Y
+  };
+}
+
 const PRINT_TRIGGER_RECTS = [
-  // elements.png 기준으로 왼쪽 아래 장판 이미지 안의 위쪽 돌.
-  // 실제 화면에서는 elements.png가 2.4배로 커져 보이므로,
-  // 클릭이 빗나가지 않도록 돌 주변까지 넉넉하게 잡았다.
-  { x: 175, y: 1970, w: 240, h: 210 }
+  // elements.png 원본 기준: 왼쪽 중하단의 장판 사진 전체.
+  // 이 안에 사용자가 말한 오른쪽 위 돌이 들어간다.
+  srcRect(0, 805, 245, 195)
 ];
 
 for (let row = 0; row < 3; row++) {
@@ -239,19 +252,28 @@ function clearLongPress() {
   longPressTarget = null;
 }
 
+let isOpeningPrint = false;
+
 function openPrintPage() {
+  if (isOpeningPrint) return;
+  isOpeningPrint = true;
+
   const panelIds = ['a', 'b', 'c', 'd'];
   const pickedPanels = shuffle(panelIds).slice(0, 2);
 
-  sessionStorage.setItem('hanPrintView', JSON.stringify({
-    x,
-    y,
-    bgSpeed: BG_SPEED,
-    elementSpeed: ELEMENT_SPEED,
-    panels: pickedPanels
-  }));
+  try {
+    sessionStorage.setItem('hanPrintView', JSON.stringify({
+      x,
+      y,
+      bgSpeed: BG_SPEED,
+      elementSpeed: ELEMENT_SPEED,
+      panels: pickedPanels
+    }));
+  } catch (err) {
+    // 저장이 막혀도 print.html 이동 자체는 되도록 둔다.
+  }
 
-  window.location.href = 'print.html';
+  window.location.assign('print.html');
 }
 
 document.addEventListener('pointerdown', e => {
@@ -268,7 +290,49 @@ document.addEventListener('pointerdown', e => {
     clearLongPress();
     openPrintPage();
   }, LONG_PRESS_MS);
-}, { passive: false });
+}, { passive: false, capture: true });
+
+// 혹시 길게 누르기가 브라우저에서 씹히는 경우를 막기 위해
+// 같은 돌 영역은 짧게 클릭해도 print.html로 이동하게 했다.
+document.addEventListener('click', e => {
+  const piece = e.target.closest('.print-trigger');
+  if (!piece) return;
+  e.preventDefault();
+  e.stopImmediatePropagation();
+  clearLongPress();
+  openPrintPage();
+}, true);
+
+// Safari/iOS에서 pointer 이벤트가 불안정할 때를 위한 터치 보강.
+document.addEventListener('touchstart', e => {
+  const piece = e.target.closest('.print-trigger');
+  if (!piece) return;
+  const t = e.touches[0];
+  longPressTarget = piece;
+  longPressStartX = t.clientX;
+  longPressStartY = t.clientY;
+  if (longPressTimer) clearTimeout(longPressTimer);
+  longPressTimer = setTimeout(() => {
+    suppressNextClick = true;
+    clearLongPress();
+    openPrintPage();
+  }, LONG_PRESS_MS);
+}, { passive: true, capture: true });
+
+// 마우스 환경에서 pointer 이벤트가 안 잡히는 경우를 위한 보강.
+document.addEventListener('mousedown', e => {
+  const piece = e.target.closest('.print-trigger');
+  if (!piece) return;
+  longPressTarget = piece;
+  longPressStartX = e.clientX;
+  longPressStartY = e.clientY;
+  if (longPressTimer) clearTimeout(longPressTimer);
+  longPressTimer = setTimeout(() => {
+    suppressNextClick = true;
+    clearLongPress();
+    openPrintPage();
+  }, LONG_PRESS_MS);
+}, true);
 
 document.addEventListener('pointermove', e => {
   if (!longPressTimer) return;
