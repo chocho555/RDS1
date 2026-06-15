@@ -231,4 +231,3 @@ document.addEventListener('click', e => {
     const popup = document.createElement('div');
     popup.className = 'popup';
     popup.innerHTML = `<p class="popup-text">${text.replace(/\n/g, '<br>')}</p>`;
-
