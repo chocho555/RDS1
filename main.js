@@ -109,9 +109,13 @@ for (let row = 0; row < 3; row++) {
   }
 }
 
-/* ── 이동 속도 ──
-   배경과 요소를 같은 좌표계로 움직여야 요소가 배경 위에 얹힌 상태로 유지된다. */
-const SPEED_WORLD = 0.6;
+/* ── 레이어별 이동 속도 ──
+   배경은 멀리 있는 레이어처럼 천천히,
+   요소 PNG는 앞에 있는 레이어처럼 더 빠르게 움직이게 해서 공간감을 만든다.
+   숫자 차이를 키울수록 깊이감이 강해진다. */
+const BG_SPEED       = 0.32;  // 배경: 느리게
+const ELEMENT_SPEED  = 0.82;  // 요소 PNG: 빠르게
+const CLICK_SPEED    = ELEMENT_SPEED; // 클릭 영역은 요소 PNG와 반드시 같은 속도
 
 let x = 0, y = 0;
 let velX = 0, velY = 0;
@@ -123,12 +127,18 @@ function wrap(val, size) {
 }
 
 function applyParallax() {
-  const tx = wrap(x * SPEED_WORLD, TILE_W);
-  const ty = wrap(y * SPEED_WORLD, TILE_H);
+  const bgX = wrap(x * BG_SPEED, TILE_W);
+  const bgY = wrap(y * BG_SPEED, TILE_H);
 
-  layerBg.style.transform       = `translate(${tx}px, ${ty}px)`;
-  layerElements.style.transform = `translate(${tx}px, ${ty}px)`;
-  layerMid.style.transform      = `translate(${tx}px, ${ty}px)`;
+  const elX = wrap(x * ELEMENT_SPEED, TILE_W);
+  const elY = wrap(y * ELEMENT_SPEED, TILE_H);
+
+  const clickX = wrap(x * CLICK_SPEED, TILE_W);
+  const clickY = wrap(y * CLICK_SPEED, TILE_H);
+
+  layerBg.style.transform       = `translate(${bgX}px, ${bgY}px)`;
+  layerElements.style.transform = `translate(${elX}px, ${elY}px)`;
+  layerMid.style.transform      = `translate(${clickX}px, ${clickY}px)`;
 }
 
 function inertia() {
