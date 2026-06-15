@@ -231,3 +231,49 @@ document.addEventListener('click', e => {
     const popup = document.createElement('div');
     popup.className = 'popup';
     popup.innerHTML = `<p class="popup-text">${text.replace(/\n/g, '<br>')}</p>`;
+    popup.style.left = left + 'px';
+    popup.style.top  = top  + 'px';
+    document.body.appendChild(popup);
+
+    piecePopup.set(id, popup);
+    const timer = setTimeout(() => {
+      popup.remove();
+      piecePopup.delete(id);
+    }, 20000);
+    popup.dataset.timer = timer;
+
+  } else {
+    document.querySelectorAll('.popup').forEach(p => {
+      clearTimeout(p.dataset.timer);
+      p.remove();
+    });
+    clickState.clear();
+    piecePopup.clear();
+  }
+});
+
+/* ── 판 시스템 ── */
+const panels = [
+  document.getElementById('panel-a'),
+  document.getElementById('panel-b'),
+  document.getElementById('panel-c'),
+  document.getElementById('panel-d'),
+];
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function showPanels() {
+  panels.forEach(p => p.style.display = 'none');
+  const picked = shuffle(panels).slice(0, 2);
+  picked.forEach(p => p.style.display = 'block');
+  setTimeout(() => { picked.forEach(p => p.style.display = 'none'); }, 10000);
+}
+
+setInterval(showPanels, 60000);
