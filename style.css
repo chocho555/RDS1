@@ -139,3 +139,8 @@ body {
   word-break: keep-all;
   overflow-wrap: break-word;
 }
+
+/* ── 길게 눌러 print 화면으로 넘어가는 숨은 트리거 ── */
+.print-trigger {
+  cursor: crosshair;
+}
