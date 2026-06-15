@@ -24,7 +24,7 @@ body {
 /* 아래 → 위 순서: 배경 / 요소 이미지 / 클릭 영역 */
 #layer-bg       { z-index:1; }
 #layer-elements { z-index:2; pointer-events:none; }
-#layer-mid      { z-index:3; pointer-events:none; }
+#layer-mid      { z-index:3; pointer-events:auto; }
 
 .tile,
 .element-tile {
@@ -138,4 +138,7 @@ body {
 /* ── 길게 눌러 print 화면으로 넘어가는 숨은 트리거 ── */
 .print-trigger {
   cursor: pointer;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
