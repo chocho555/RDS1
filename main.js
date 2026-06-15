@@ -102,15 +102,36 @@ for (let row = 0; row < 3; row++) {
       el.dataset.title = p.title;
       el.dataset.desc  = p.desc;
 
-      // 26번 조각(옆에 있는 돌/장판 고정)을 길게 누르면 print 화면으로 이동
-      if (p.id === 26) {
-        el.classList.add('print-trigger');
-        el.title = 'hold to print';
-      }
-
       // 실제 이미지는 #layer-elements의 elements.png에서 보여주고,
       // 이 div는 팝업을 띄우기 위한 투명 클릭 영역만 담당한다.
       layerMid.appendChild(el);
+    });
+  }
+}
+
+
+/* ── 오른쪽 위의 작은 돌 전용 길게 누르기 영역 ──
+   화면에는 보이지 않는 투명 영역이다.
+   요소 이미지가 2000×1250에서 4800×3000으로 커져 보이므로,
+   돌 위치도 같은 비율에 맞춘 좌표로 잡았다. */
+const PRINT_TRIGGER_RECTS = [
+  { x: 335, y: 2085, w: 150, h: 115 }
+];
+
+for (let row = 0; row < 3; row++) {
+  for (let col = 0; col < 3; col++) {
+    const offsetX = col * TILE_W;
+    const offsetY = row * TILE_H;
+
+    PRINT_TRIGGER_RECTS.forEach(r => {
+      const trigger = document.createElement('div');
+      trigger.className = 'piece print-trigger';
+      trigger.style.left = (offsetX + r.x) + 'px';
+      trigger.style.top = (offsetY + r.y) + 'px';
+      trigger.style.width = r.w + 'px';
+      trigger.style.height = r.h + 'px';
+      trigger.dataset.printTrigger = 'true';
+      layerMid.appendChild(trigger);
     });
   }
 }
@@ -198,11 +219,9 @@ document.addEventListener('touchend', () => {
 
 applyParallax();
 
-/* ── 돌 길게 누르기 → print.html 이동 ──
-   26번 조각은 화면 왼쪽 아래에 있는 '장판 고정/돌' 이미지다.
-   짧게 클릭하면 기존처럼 팝업이 뜨고, 길게 누르면 현재 위치를 저장한 뒤
+/* ── 오른쪽 위의 작은 돌 길게 누르기 → print.html 이동 ──
+   짧게 눌러도 글자가 뜨지 않고, 길게 누르면 현재 위치를 저장한 뒤
    가림막이 덮인 print 화면으로 넘어간다. */
-const PRINT_TRIGGER_ID = '26';
 const LONG_PRESS_MS = 850;
 const LONG_PRESS_MOVE_LIMIT = 14;
 let longPressTimer = null;
@@ -233,8 +252,8 @@ function openPrintPage() {
 }
 
 document.addEventListener('pointerdown', e => {
-  const piece = e.target.closest('.piece');
-  if (!piece || piece.dataset.id !== PRINT_TRIGGER_ID) return;
+  const piece = e.target.closest('.print-trigger');
+  if (!piece) return;
 
   longPressTarget = piece;
   longPressStartX = e.clientX;
@@ -265,11 +284,14 @@ document.addEventListener('click', e => {
   suppressNextClick = false;
 }, true);
 
-/* ── 팝업 시스템 (1번 클릭: title, 2번 클릭: desc) ── */
+/* ── 팝업 시스템 ──
+   현재 버전에서는 화면 위 글자가 뜨지 않도록 비활성화했다. */
+const ENABLE_POPUPS = false;
 const clickState = new Map();  // id → 'title' | 'desc'
 const piecePopup = new Map();  // id → 현재 띄워진 popup 엘리먼트
 
 document.addEventListener('click', e => {
+  if (!ENABLE_POPUPS) return;
   const piece = e.target.closest('.piece');
 
   if (piece) {
