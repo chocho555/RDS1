@@ -7,27 +7,8 @@
   <link rel="stylesheet" href="print.css" />
 </head>
 <body>
-  <main id="print-stage" aria-label="print preview">
-    <div id="print-layer-bg">
-      <div class="print-tile"></div>
-      <div class="print-tile"></div>
-      <div class="print-tile"></div>
-      <div class="print-tile"></div>
-      <div class="print-tile"></div>
-      <div class="print-tile"></div>
-      <div class="print-tile"></div>
-      <div class="print-tile"></div>
-      <div class="print-tile"></div>
-    </div>
-
-    <div id="print-layer-elements"></div>
-
-    <!-- print 화면에서는 가림막이 항상 화면 위를 덮도록 구성 -->
-    <div class="print-panel" data-panel="a"></div>
-    <div class="print-panel" data-panel="b"></div>
-    <div class="print-panel" data-panel="c"></div>
-    <div class="print-panel" data-panel="d"></div>
-  </main>
+  <!-- main.html에서 저장한 가림판 장면들이 여기에 페이지 단위로 생성됨 -->
+  <main id="print-pages" aria-label="print preview"></main>
 
   <script src="print.js"></script>
 </body>
