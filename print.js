@@ -12,6 +12,7 @@ const SCALE  = 1.2;
 const TILE_W = IMG_W * SCALE;
 const TILE_H = IMG_H * SCALE;
 const CAPTURE_STORE_KEY = 'hanPanelCaptures';
+const CAPTURE_PRINT_TRANSFER_KEY = 'hanPanelCapturesForPrint';
 
 function wrap(val, size) {
   return ((val % size) + size) % size - size;
@@ -22,11 +23,36 @@ function getAfterUrl() {
   return params.get('after') || '';
 }
 
-function readCaptures() {
+function decodeCapturesFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const packed = params.get('captures');
+  if (!packed) return [];
+
   try {
-    const parsed = JSON.parse(localStorage.getItem(CAPTURE_STORE_KEY) || '[]');
-    if (Array.isArray(parsed) && parsed.length) return parsed;
-  } catch (err) {}
+    let base64 = packed.replace(/-/g, '+').replace(/_/g, '/');
+    while (base64.length % 4) base64 += '=';
+    const parsed = JSON.parse(atob(base64));
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (err) {
+    return [];
+  }
+}
+
+function readCaptures() {
+  const fromUrl = decodeCapturesFromUrl();
+  if (fromUrl.length) return fromUrl;
+
+  const keys = [CAPTURE_PRINT_TRANSFER_KEY, CAPTURE_STORE_KEY];
+  const stores = [sessionStorage, localStorage];
+
+  for (const key of keys) {
+    for (const store of stores) {
+      try {
+        const parsed = JSON.parse(store.getItem(key) || '[]');
+        if (Array.isArray(parsed) && parsed.length) return parsed;
+      } catch (err) {}
+    }
+  }
 
   // 예전 버전에서 sessionStorage에 저장한 단일 장면도 백업으로 지원한다.
   try {
@@ -93,6 +119,9 @@ function createPage(capture) {
 
 function clearSavedCaptures() {
   try { localStorage.removeItem(CAPTURE_STORE_KEY); } catch (err) {}
+  try { localStorage.removeItem(CAPTURE_PRINT_TRANSFER_KEY); } catch (err) {}
+  try { sessionStorage.removeItem(CAPTURE_STORE_KEY); } catch (err) {}
+  try { sessionStorage.removeItem(CAPTURE_PRINT_TRANSFER_KEY); } catch (err) {}
   try { sessionStorage.removeItem('hanPrintView'); } catch (err) {}
 }
 
