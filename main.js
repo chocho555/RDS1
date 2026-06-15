@@ -1,20 +1,27 @@
 (() => {
   "use strict";
 
-  // ▼▼▼ 본인 이미지 파일명 ▼▼▼
-  const IMAGES = [
-    "images/조각/001.jpg","images/조각/002.jpg","images/조각/003.jpg",
-    "images/조각/004.jpg","images/조각/005.jpg","images/조각/006.jpg",
-    "images/조각/007.jpg","images/조각/008.jpg","images/조각/009.jpg",
-    "images/조각/010.jpg","images/조각/011.jpg","images/조각/012.jpg",
-    "images/조각/013.jpg","images/조각/014.jpg","images/조각/015.jpg",
-    "images/조각/016.jpg","images/조각/017.jpg","images/조각/018.jpg",
+  const DIR = "images/조각/";   // 이미지 폴더 경로
+  const IMAGES = Array.from({length:18}, (_,i)=>`${DIR}${String(i+1).padStart(3,"0")}.jpg`);
+  const BG_IMAGE = `${DIR}001.jpg`;   // 무한히 흐르는 배경 1장
+
+  const CANVAS = { w:2000, h:1250 };  // 좌표 기준 캔버스(원본 PSD 크기)
+  // 보내주신 배치 그대로. 옮기려면 x,y,w,h 만 바꾸면 됨 (001~018 순서)
+  const POSITIONS = [
+    {x:113, y:96,  w:242, h:161}, {x:803, y:343, w:150, h:224},
+    {x:355, y:177, w:250, h:166}, {x:803, y:567, w:213, h:142},
+    {x:8,   y:257, w:347, h:232}, {x:-16, y:974, w:426, h:286},
+    {x:1595,y:983, w:179, h:267}, {x:0,   y:827, w:221, h:147},
+    {x:355, y:59,  w:177, h:118}, {x:1213,y:22,  w:289, h:193},
+    {x:387, y:431, w:416, h:278}, {x:1774,y:827, w:226, h:340},
+    {x:1502,y:145, w:339, h:225}, {x:1402,y:370, w:201, h:134},
+    {x:803, y:69,  w:412, h:274}, {x:551, y:712, w:252, h:377},
+    {x:1091,y:1094,w:234, h:156}, {x:953, y:950, w:216, h:144},
   ];
-  // 무한 배경으로 깔 이미지 1장 (안 쓰려면 "" 로)
-  const BG_IMAGE = "images/조각/000.jpg";
-  // ▲▲▲ 여기까지 ▲▲▲
-  const BG_PARALLAX = 0.34;          // 배경 시차(작을수록 멀고 느림)
-  const DRIFT = { x:0.22, y:0.085 }; // 가만히 둘 때 자동 흐름 속도
+
+  const ZOOM = 2.6;                    // ★ 시야 가까움 (클수록 더 확대 / 멀게는 2.0, 더 가깝게는 3.2)
+  const BG_PARALLAX = 0.34;
+  const BG_DRIFT = { x:0.18, y:0.07 }; // 배경이 저절로 흐르는 속도
   const INERTIA_DECAY = 0.93;
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -25,55 +32,36 @@
   function rng(seed){ return function(){ seed|=0; seed=seed+0x6D2B79F5|0;
     let t=Math.imul(seed^seed>>>15,1|seed); t=t+Math.imul(t^t>>>7,61|t)^t;
     return ((t^t>>>14)>>>0)/4294967296; }; }
+  const R = rng(20260616);
+  const FLOAT = POSITIONS.map(()=>({ax:4+R()*7,ay:3+R()*6,ar:0.2+R()*0.7,dur:9+R()*8,delay:-R()*12}));
 
-  function computeLayout(n){
-    const r = rng(20260616);
-    const COLS = Math.max(3, Math.min(6, Math.round(Math.sqrt(n*1.6))));
-    const rows = Math.ceil(n/COLS);
-    const colW = 480, rowH = 360;
-    const items = [];
-    for (let i=0;i<n;i++){
-      const col=i%COLS, row=Math.floor(i/COLS);
-      items.push({
-        x: col*colW + (r()*90-45),
-        y: row*rowH + (r()*90-45),
-        w: colW*(0.70+r()*0.36),
-        ax:4+r()*7, ay:3+r()*6, ar:0.2+r()*0.7, dur:9+r()*8, delay:-r()*12,
-      });
-    }
-    return { items, CW: COLS*colW, CH: rows*rowH };
-  }
-
-  const LAYOUT = computeLayout(IMAGES.length);
-  let scale=1, CW=LAYOUT.CW, CH=LAYOUT.CH, cols=0, rows=0;
-  let offX=0, offY=0, velX=0, velY=0;
+  let scale=1, CW=CANVAS.w, CH=CANVAS.h, cols=0, rows=0;
+  let camX=0, camY=0, velX=0, velY=0, bgX=0, bgY=0;
   let dragging=false, lastX=0, lastY=0, lastDX=0, lastDY=0;
 
-  function computeScale(){
-    scale = Math.max(0.5, Math.min(0.95, Math.min(innerWidth, innerHeight)/900));
-    CW = LAYOUT.CW*scale; CH = LAYOUT.CH*scale;
-  }
+  function computeScale(){ scale = ZOOM; CW = CANVAS.w*scale; CH = CANVAS.h*scale; }
 
   function buildCell(cx, cy){
     const cell=document.createElement("div");
     cell.className="cell"; cell.style.width=CW+"px"; cell.style.height=CH+"px";
     cell.style.transform=`translate3d(${cx*CW}px, ${cy*CH}px, 0)`;
-    LAYOUT.items.forEach((t,i)=>{
+    POSITIONS.forEach((t,i)=>{
       const img=document.createElement("img");
-      img.className="tile"; img.src=IMAGES[i]; img.alt=""; img.decoding="async"; img.draggable=false;
-      img.style.left=(t.x*scale)+"px"; img.style.top=(t.y*scale)+"px"; img.style.width=(t.w*scale)+"px";
+      img.className="tile"; img.src=IMAGES[i]; img.alt=""; img.draggable=false;
+      img.style.left=(t.x*scale)+"px"; img.style.top=(t.y*scale)+"px";
+      img.style.width=(t.w*scale)+"px"; img.style.height=(t.h*scale)+"px";
       if(!reduceMotion){
-        img.style.setProperty("--dur",t.dur.toFixed(2)+"s");
-        img.style.setProperty("--delay",t.delay.toFixed(2)+"s");
-        img.style.setProperty("--ax",t.ax.toFixed(1)+"px");
-        img.style.setProperty("--ay",t.ay.toFixed(1)+"px");
-        img.style.setProperty("--ar",t.ar.toFixed(2)+"deg");
+        const f=FLOAT[i];
+        img.style.setProperty("--dur",f.dur.toFixed(2)+"s");
+        img.style.setProperty("--delay",f.delay.toFixed(2)+"s");
+        img.style.setProperty("--ax",f.ax.toFixed(1)+"px");
+        img.style.setProperty("--ay",f.ay.toFixed(1)+"px");
+        img.style.setProperty("--ar",f.ar.toFixed(2)+"deg");
       }
       cell.appendChild(img);
     });
     return cell;
   }
-
   function buildGrid(){
     world.innerHTML="";
     cols=Math.ceil(innerWidth/CW)+1; rows=Math.ceil(innerHeight/CH)+1;
@@ -83,37 +71,33 @@
   }
   function rebuild(){ computeScale(); buildGrid(); }
 
-  // 아무 이미지든 캔버스로 2x2 미러 → 이음매 없는 무한 배경 자동 생성
+  // 001.jpg 를 캔버스로 2x2 미러 → 이음매 없이 무한 반복되는 배경
   function makeSeamlessBg(src){
     return new Promise(res=>{
       if(!src){ res(null); return; }
       const im=new Image();
-      im.onload=()=>{
-        try{
-          const w=im.naturalWidth, h=im.naturalHeight;
-          const c=document.createElement("canvas"); c.width=w*2; c.height=h*2;
-          const x=c.getContext("2d");
-          x.drawImage(im,0,0);
-          x.save(); x.translate(w*2,0);  x.scale(-1, 1); x.drawImage(im,0,0); x.restore();
-          x.save(); x.translate(0,h*2);  x.scale( 1,-1); x.drawImage(im,0,0); x.restore();
-          x.save(); x.translate(w*2,h*2);x.scale(-1,-1); x.drawImage(im,0,0); x.restore();
-          res({ url:c.toDataURL("image/jpeg",0.82), w:w*2, h:h*2 });
-        }catch(e){ res({ url:src, w:im.naturalWidth, h:im.naturalHeight }); }
-      };
+      im.onload=()=>{ try{
+        const w=im.naturalWidth,h=im.naturalHeight;
+        const c=document.createElement("canvas"); c.width=w*2; c.height=h*2;
+        const x=c.getContext("2d");
+        x.drawImage(im,0,0);
+        x.save();x.translate(w*2,0);x.scale(-1,1);x.drawImage(im,0,0);x.restore();
+        x.save();x.translate(0,h*2);x.scale(1,-1);x.drawImage(im,0,0);x.restore();
+        x.save();x.translate(w*2,h*2);x.scale(-1,-1);x.drawImage(im,0,0);x.restore();
+        res({url:c.toDataURL("image/jpeg",0.82),w:w*2,h:h*2});
+      }catch(e){ res({url:src,w:im.naturalWidth,h:im.naturalHeight}); } };
       im.onerror=()=>res(null);
       im.src=src;
     });
   }
 
   function frame(){
-    if(!dragging){
-      offX+=DRIFT.x+velX; offY+=DRIFT.y+velY;
-      velX*=INERTIA_DECAY; velY*=INERTIA_DECAY;
-      if(Math.abs(velX)<0.01) velX=0; if(Math.abs(velY)<0.01) velY=0;
-    }
-    bg.style.backgroundPosition=`${(-offX*BG_PARALLAX).toFixed(2)}px ${(-offY*BG_PARALLAX).toFixed(2)}px`;
-    let mx=(-offX)%CW; if(mx>0) mx-=CW;
-    let my=(-offY)%CH; if(my>0) my-=CH;
+    bgX += BG_DRIFT.x; bgY += BG_DRIFT.y;                 // 배경만 계속 무한히 이동
+    if(!dragging){ camX+=velX; camY+=velY; velX*=INERTIA_DECAY; velY*=INERTIA_DECAY;
+      if(Math.abs(velX)<0.01)velX=0; if(Math.abs(velY)<0.01)velY=0; }
+    bg.style.backgroundPosition=`${(-(camX*BG_PARALLAX+bgX)).toFixed(2)}px ${(-(camY*BG_PARALLAX+bgY)).toFixed(2)}px`;
+    let mx=(-camX)%CW; if(mx>0)mx-=CW;
+    let my=(-camY)%CH; if(my>0)my-=CH;
     world.style.transform=`translate3d(${mx.toFixed(2)}px, ${my.toFixed(2)}px, 0)`;
     requestAnimationFrame(frame);
   }
@@ -121,12 +105,12 @@
   function point(e){ return e.touches&&e.touches[0]?{x:e.touches[0].clientX,y:e.touches[0].clientY}:{x:e.clientX,y:e.clientY}; }
   function onDown(e){ dragging=true; stage.classList.add("dragging");
     const p=point(e); lastX=p.x; lastY=p.y; lastDX=0; lastDY=0; velX=velY=0;
-    if(e.pointerId!=null&&stage.setPointerCapture){ try{stage.setPointerCapture(e.pointerId);}catch(_){} } }
-  function onMove(e){ if(!dragging) return;
-    const p=point(e); const dx=p.x-lastX, dy=p.y-lastY; lastX=p.x; lastY=p.y; lastDX=dx; lastDY=dy;
-    offX-=dx; offY-=dy; if(Math.abs(dx)+Math.abs(dy)>2) dismissHint(); }
-  function onUp(){ if(!dragging) return; dragging=false; stage.classList.remove("dragging"); velX=-lastDX*0.9; velY=-lastDY*0.9; }
-  function onWheel(e){ e.preventDefault(); offX+=e.deltaX*0.85; offY+=e.deltaY*0.85; dismissHint(); }
+    if(e.pointerId!=null&&stage.setPointerCapture){try{stage.setPointerCapture(e.pointerId);}catch(_){}} }
+  function onMove(e){ if(!dragging)return;
+    const p=point(e); const dx=p.x-lastX,dy=p.y-lastY; lastX=p.x; lastY=p.y; lastDX=dx; lastDY=dy;
+    camX-=dx; camY-=dy; }
+  function onUp(){ if(!dragging)return; dragging=false; stage.classList.remove("dragging"); velX=-lastDX*0.9; velY=-lastDY*0.9; }
+  function onWheel(e){ e.preventDefault(); camX+=e.deltaX*0.85; camY+=e.deltaY*0.85; }
 
   if(window.PointerEvent){
     stage.addEventListener("pointerdown",onDown);
@@ -139,29 +123,11 @@
     window.addEventListener("touchmove",onMove,{passive:true}); window.addEventListener("touchend",onUp);
   }
   stage.addEventListener("wheel",onWheel,{passive:false});
-  window.addEventListener("keydown",(e)=>{ const s=90;
-    if(e.key==="ArrowLeft"){offX-=s;dismissHint();} else if(e.key==="ArrowRight"){offX+=s;dismissHint();}
-    else if(e.key==="ArrowUp"){offY-=s;dismissHint();} else if(e.key==="ArrowDown"){offY+=s;dismissHint();} });
 
-  const hint=document.getElementById("hint"); let hintGone=false;
-  function dismissHint(){ if(hintGone||!hint) return; hintGone=true; hint.classList.add("gone"); }
-  setTimeout(dismissHint,6000);
-
-  const panel=document.getElementById("info-panel"); const infoBtn=document.getElementById("info-btn");
-  if(infoBtn&&panel){ infoBtn.addEventListener("click",()=>panel.hidden=!panel.hidden);
-    panel.querySelector(".close").addEventListener("click",()=>panel.hidden=true);
-    window.addEventListener("keydown",(e)=>{ if(e.key==="Escape") panel.hidden=true; }); }
-
-  let rT; window.addEventListener("resize",()=>{ clearTimeout(rT); rT=setTimeout(rebuild,180); });
-
-  const loader=document.getElementById("loader");
-  function preload(){ return Promise.all(IMAGES.map(src=>new Promise(res=>{ const im=new Image(); im.onload=im.onerror=res; im.src=src; }))); }
+  let rT; window.addEventListener("resize",()=>{clearTimeout(rT);rT=setTimeout(rebuild,180);});
 
   rebuild();
-  makeSeamlessBg(BG_IMAGE).then(t=>{
-    if(t){ bg.style.backgroundImage=`url("${t.url}")`;
-      bg.style.backgroundSize=`${Math.round(t.w*0.7)}px ${Math.round(t.h*0.7)}px`; }
-  });
-  preload().then(()=>{ if(loader){ loader.classList.add("done"); setTimeout(()=>loader.remove(),650); } });
+  makeSeamlessBg(BG_IMAGE).then(t=>{ if(t){ bg.style.backgroundImage=`url("${t.url}")`;
+    bg.style.backgroundSize=`${Math.round(t.w*0.7)}px ${Math.round(t.h*0.7)}px`; } });
   requestAnimationFrame(frame);
 })();
