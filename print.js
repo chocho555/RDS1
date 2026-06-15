@@ -4,7 +4,12 @@
      A4 landscape 페이지로 다시 구성한 뒤 한 번에 인쇄한다.
    ===================================================== */
 
-const pagesRoot = document.getElementById('print-pages');
+let pagesRoot = document.getElementById('print-pages');
+if (!pagesRoot) {
+  pagesRoot = document.createElement('main');
+  pagesRoot.id = 'print-pages';
+  document.body.appendChild(pagesRoot);
+}
 
 const IMG_W  = 4000;
 const IMG_H  = 2500;
