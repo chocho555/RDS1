@@ -70,16 +70,20 @@ panels.forEach(id => {
   if (panel) panel.classList.add('active');
 });
 
-document.getElementById('print-now').addEventListener('click', () => window.print());
-document.getElementById('go-back').addEventListener('click', () => {
-  window.location.href = 'main.html';
-});
+const printNowButton = document.getElementById('print-now');
+const goBackButton = document.getElementById('go-back');
+
+if (printNowButton) printNowButton.addEventListener('click', () => window.print());
+if (goBackButton) {
+  goBackButton.addEventListener('click', () => {
+    window.location.href = 'main.html';
+  });
+}
 
 window.addEventListener('load', () => {
   document.body.classList.add('ready');
 
   // 돌을 길게 누른 뒤 바로 인쇄창이 뜨도록 한다.
-  // 브라우저 설정에 따라 자동 인쇄가 막히면 오른쪽 아래 print 버튼을 누르면 된다.
   setTimeout(() => {
     window.print();
   }, 450);
