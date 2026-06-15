@@ -53,15 +53,21 @@
 
   <script src="main.js"></script>
   <script>
-    window.addEventListener('load', () => {
-      const fadeIn = document.getElementById('fade-in');
-      fadeIn.style.opacity = '0';
-      setTimeout(() => fadeIn.remove(), 900);
+  window.addEventListener('load', () => {
+    const fadeIn = document.getElementById('fade-in');
+    fadeIn.style.opacity = '0';
+    setTimeout(() => fadeIn.remove(), 900);
 
-      document.getElementById('home-btn').addEventListener('click', () => {
+    document.getElementById('home-btn').addEventListener('click', (e) => {
+      e.preventDefault();
+
+      if (window.routeToPrintBeforeLeaving) {
+        window.routeToPrintBeforeLeaving('index.html');
+      } else {
         window.location.href = 'index.html';
-      });
+      }
     });
-  </script>
+  });
+</script>
 </body>
 </html>
