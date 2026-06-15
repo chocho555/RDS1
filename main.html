@@ -1,3 +1,5 @@
+
+@@ -1,92 +1,51 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -40,24 +42,3 @@
 
     <!-- 조각들은 main.js가 동적으로 생성 -->
     <div id="layer-mid"></div>
-  </div>
-
-  <div class="panel" id="panel-a"></div>
-  <div class="panel" id="panel-b"></div>
-  <div class="panel" id="panel-c"></div>
-  <div class="panel" id="panel-d"></div>
-
-  <script src="main.js"></script>
-  <script>
-    window.addEventListener('load', () => {
-      const fadeIn = document.getElementById('fade-in');
-      fadeIn.style.opacity = '0';
-      setTimeout(() => fadeIn.remove(), 900);
-
-      document.getElementById('home-btn').addEventListener('click', () => {
-        window.location.href = 'index.html';
-      });
-    });
-  </script>
-</body>
-</html>
