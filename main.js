@@ -470,6 +470,7 @@ document.addEventListener('click', e => {
 });
 
 /* ── 판 시스템 ── */
+/* ── 판 시스템 ── */
 const panels = [
   document.getElementById('panel-a'),
   document.getElementById('panel-b'),
@@ -477,35 +478,68 @@ const panels = [
   document.getElementById('panel-d'),
 ];
 
+const BG_IMAGE_SRC = 'images/bg/사문디_배경.jpg';
+const ELEMENT_IMAGE_SRC = 'images/elements.png';
+
+const PANEL_IMAGE_SRC = {
+  a: 'images/가림막1.png',
+  b: 'images/가림막2.png',
+  c: 'images/가림막3.png',
+  d: 'images/가림막4.png'
+};
+
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = src;
+  });
+}
+
+const assetImages = {
+  bg: null,
+  elements: null,
+  panels: {}
+};
+
+const assetsReady = Promise.all([
+  loadImage(BG_IMAGE_SRC).then(img => {
+    assetImages.bg = img;
+  }),
+  loadImage(ELEMENT_IMAGE_SRC).then(img => {
+    assetImages.elements = img;
+  }),
+  ...Object.entries(PANEL_IMAGE_SRC).map(([id, src]) =>
+    loadImage(src).then(img => {
+      assetImages.panels[id] = img;
+    })
+  )
+]).catch(err => {
+  console.warn('asset preload failed', err);
+});
+
 function shuffle(arr) {
   const a = [...arr];
+
   for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [a[i], a[j]] = [a[j], a[i]];
   }
+
   return a;
 }
 
 const PANEL_INTERVAL_MS = 60000;
 const PANEL_VISIBLE_MS = 10000;
+
 const CAPTURE_STORE_KEY = 'hanPanelCaptures';
 const CAPTURE_PRINT_TRANSFER_KEY = 'hanPanelCapturesForPrint';
-const MAX_CAPTURE_COUNT = 40;
+const MAX_CAPTURE_COUNT = 12;
 
 let panelHideTimer = null;
 let isRoutingToPrint = false;
 let memoryCaptures = [];
-
-function encodeCapturesForUrl(captures) {
-  try {
-    return btoa(JSON.stringify(captures))
-      .replace(/\+/g, '-')
-      .replace(/\//g, '_')
-      .replace(/=+$/g, '');
-  } catch (err) {
-    return '';
-  }
-}
 
 function getPanelId(panel) {
   return panel.id.replace('panel-', '');
@@ -516,17 +550,19 @@ function clearPanels() {
     panel.style.display = 'none';
     panel.classList.remove('active-for-print');
   });
+
   document.body.classList.remove('panel-printing');
 }
 
 function readStoredCaptures() {
   if (memoryCaptures.length) return [...memoryCaptures];
 
-  const stores = [localStorage, sessionStorage];
+  const stores = [sessionStorage, localStorage];
 
   for (const store of stores) {
     try {
       const parsed = JSON.parse(store.getItem(CAPTURE_STORE_KEY) || '[]');
+
       if (Array.isArray(parsed) && parsed.length) {
         memoryCaptures = parsed;
         return parsed;
@@ -541,57 +577,96 @@ function writeStoredCaptures(captures) {
   memoryCaptures = [...captures];
   const data = JSON.stringify(captures);
 
-  try { localStorage.setItem(CAPTURE_STORE_KEY, data); } catch (err) {}
-  try { sessionStorage.setItem(CAPTURE_STORE_KEY, data); } catch (err) {}
+  try {
+    sessionStorage.setItem(CAPTURE_STORE_KEY, data);
+  } catch (err) {}
+
+  try {
+    localStorage.setItem(CAPTURE_STORE_KEY, data);
+  } catch (err) {}
 }
 
 function hasStoredCaptures() {
   return readStoredCaptures().length > 0;
 }
 
-function savePanelCapture(picked) {
-  const captures = readStoredCaptures();
+function drawTiledLayer(ctx, img, offsetX, offsetY) {
+  if (!img) return;
 
-  captures.push({
-    x,
-    y,
-    bgSpeed: BG_SPEED,
-    elementSpeed: ELEMENT_SPEED,
-    panels: picked.map(getPanelId),
-    createdAt: Date.now()
+  for (let row = 0; row < 3; row++) {
+    for (let col = 0; col < 3; col++) {
+      const drawX = offsetX + col * TILE_W;
+      const drawY = offsetY + row * TILE_H;
+
+      ctx.drawImage(img, drawX, drawY, TILE_W, TILE_H);
+    }
+  }
+}
+
+async function captureCurrentPanelScene(picked) {
+  await assetsReady;
+
+  const viewportW = window.innerWidth;
+  const viewportH = window.innerHeight;
+
+  const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.max(1200, Math.round(viewportW * dpr));
+  canvas.height = Math.max(850, Math.round(viewportH * dpr));
+
+  const ctx = canvas.getContext('2d', { alpha: false });
+
+  ctx.scale(canvas.width / viewportW, canvas.height / viewportH);
+
+  ctx.fillStyle = '#000000';
+  ctx.fillRect(0, 0, viewportW, viewportH);
+
+  const bgX = wrap(x * BG_SPEED, TILE_W);
+  const bgY = wrap(y * BG_SPEED, TILE_H);
+
+  const elX = wrap(x * ELEMENT_SPEED, TILE_W);
+  const elY = wrap(y * ELEMENT_SPEED, TILE_H);
+
+  // 1. 배경 캡처
+  drawTiledLayer(ctx, assetImages.bg, bgX, bgY);
+
+  // 2. 요소 PNG 캡처
+  drawTiledLayer(ctx, assetImages.elements, elX, elY);
+
+  // 3. 가림막 캡처
+  picked.forEach(panel => {
+    const panelId = getPanelId(panel);
+    const panelImg = assetImages.panels[panelId];
+
+    if (panelImg) {
+      ctx.drawImage(panelImg, 0, 0, viewportW, viewportH);
+    }
   });
 
-  writeStoredCaptures(captures.slice(-MAX_CAPTURE_COUNT));
+  return canvas.toDataURL('image/jpeg', 0.9);
+}
+
+async function savePanelCapture(picked) {
+  const captures = readStoredCaptures();
+
+  try {
+    const imageDataUrl = await captureCurrentPanelScene(picked);
+
+    captures.push({
+      imageDataUrl,
+      createdAt: Date.now()
+    });
+
+    writeStoredCaptures(captures.slice(-MAX_CAPTURE_COUNT));
+  } catch (err) {
+    console.warn('capture save failed', err);
+  }
 }
 
 function routeToPrintBeforeLeaving(afterUrl) {
-  let captures = readStoredCaptures();
+  const captures = readStoredCaptures();
 
-  // 홈 버튼을 누르는 바로 그 순간 가림막이 화면에 떠 있다면,
-  // 아직 저장되지 않은 상태까지 한 번 더 챙겨서 print.html로 넘긴다.
-  const activePanels = panels.filter(panel => panel.style.display === 'block');
-  if (activePanels.length) {
-    const activeIds = activePanels.map(getPanelId).sort().join(',');
-    const lastCapture = captures[captures.length - 1];
-    const lastIds = lastCapture && Array.isArray(lastCapture.panels)
-      ? [...lastCapture.panels].sort().join(',')
-      : '';
-
-    if (activeIds !== lastIds) {
-      captures.push({
-        x,
-        y,
-        bgSpeed: BG_SPEED,
-        elementSpeed: ELEMENT_SPEED,
-        panels: activePanels.map(getPanelId),
-        createdAt: Date.now()
-      });
-      captures = captures.slice(-MAX_CAPTURE_COUNT);
-      writeStoredCaptures(captures);
-    }
-  }
-
-  // 저장된 가림막 장면이 없으면 원래처럼 홈으로 이동한다.
   if (!captures.length) {
     window.location.href = afterUrl;
     return;
@@ -599,14 +674,16 @@ function routeToPrintBeforeLeaving(afterUrl) {
 
   isRoutingToPrint = true;
 
-  // file:// 환경에서는 localStorage가 print.html에 잘 안 넘어가는 경우가 있어서
-  // sessionStorage와 URL 두 군데로 동시에 넘긴다.
-  try { sessionStorage.setItem(CAPTURE_PRINT_TRANSFER_KEY, JSON.stringify(captures)); } catch (err) {}
+  try {
+    sessionStorage.setItem(CAPTURE_PRINT_TRANSFER_KEY, JSON.stringify(captures));
+  } catch (err) {}
 
-  const packed = encodeCapturesForUrl(captures);
+  try {
+    localStorage.setItem(CAPTURE_PRINT_TRANSFER_KEY, JSON.stringify(captures));
+  } catch (err) {}
+
   const params = new URLSearchParams();
   params.set('after', afterUrl);
-  if (packed) params.set('captures', packed);
 
   window.location.href = 'print.html?' + params.toString();
 }
@@ -624,20 +701,21 @@ function showPanels() {
 
   document.body.classList.add('panel-printing');
 
-  // 가림막이 화면에 뜨는 순간, 현재 장면 정보를 캡쳐 목록에 저장한다.
-  // 실제 픽셀 스크린샷이 아니라, 배경 위치 + 요소 위치 + 가림막 조합을 저장해
-  // print.html에서 같은 화면을 다시 구성하는 방식이다.
-  savePanelCapture(picked);
+  // 가림막이 실제로 화면에 뜬 직후, 그 상태를 캡처한다.
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      savePanelCapture(picked);
+    }, 80);
+  });
 
   panelHideTimer = setTimeout(() => {
     clearPanels();
   }, PANEL_VISIBLE_MS);
 }
 
-// 브라우저 탭을 닫거나 새로고침하는 순간에는 보안상 새 프린트창을 안정적으로 열 수 없다.
-// 대신 저장된 장면이 있으면 이탈 확인창을 띄워 실수로 캡쳐를 잃지 않게 한다.
 window.addEventListener('beforeunload', e => {
   if (isRoutingToPrint || !hasStoredCaptures()) return;
+
   e.preventDefault();
   e.returnValue = '';
 });
@@ -646,13 +724,13 @@ setInterval(showPanels, PANEL_INTERVAL_MS);
 
 window.routeToPrintBeforeLeaving = routeToPrintBeforeLeaving;
 
-// main.html의 인라인 스크립트가 실패하거나 다른 클릭 이벤트에 묻히는 경우를 막기 위해
-// main.js에서도 홈 버튼을 직접 묶어둔다.
 const homeButtonForPrint = document.getElementById('home-btn');
+
 if (homeButtonForPrint) {
   homeButtonForPrint.addEventListener('click', e => {
     e.preventDefault();
     e.stopImmediatePropagation();
+
     routeToPrintBeforeLeaving('index.html');
   }, true);
 }
