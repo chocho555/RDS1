@@ -2,37 +2,66 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <title>사문디 — 무한 기록</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@300;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portfolio</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: #ffffff;
+      font-family: 'Courier New', monospace;
+    }
+
+    #enter {
+      position: absolute;
+      left: 50%;
+      bottom: 6vh;
+      transform: translateX(-50%);
+      width: 50px;
+      cursor: pointer;
+    }
+
+    #enter img {
+      width: 100%;
+      height: auto;
+      display: block;
+      mix-blend-mode: multiply;
+    }
+
+    #overlay {
+      position: fixed;
+      inset: 0;
+      background: #000000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.6s ease;
+      z-index: 99;
+    }
+
+    #overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+  </style>
 </head>
 <body>
-  <div id="stage" aria-label="사문디 무한 평면. 드래그하거나 스크롤하여 둘러보세요.">
-    <div id="bg" aria-hidden="true"></div>
-    <div id="world" aria-hidden="true"></div>
-    <div id="grain" aria-hidden="true"></div>
-    <div id="vignette" aria-hidden="true"></div>
+
+  <div id="overlay"></div>
+
+  <div id="enter" title="enter">
+    <img src="images/landing.png" alt="enter" draggable="false" />
   </div>
-  <header id="masthead">
-    <div class="title-row"><span class="dot"></span><h1>사문디</h1></div>
-    <p class="sub">재개발 기록 · Redevelopment Archive</p>
-  </header>
-  <button id="info-btn" type="button" aria-label="정보 보기">정보</button>
-  <div id="hint" role="status"><span class="hint-pulse"></span>드래그 · 스크롤하여 둘러보기</div>
-  <aside id="info-panel" hidden>
-    <button class="close" type="button" aria-label="닫기">✕</button>
-    <h2>사문디 <span>無限</span></h2>
-    <p>흩어진 장면들이 어디에도 닿지 않은 채 끝없이 이어집니다.</p>
-    <ul>
-      <li><kbd>드래그</kbd> 어느 방향으로든 이동</li>
-      <li><kbd>스크롤</kbd> 위아래·좌우로 이동</li>
-      <li><kbd>가만히</kbd> 두면 스스로 흐름</li>
-    </ul>
-  </aside>
-  <div id="loader"><span></span></div>
-  <script src="main.js"></script>
+
+  <script>
+    const enter   = document.getElementById('enter');
+    const overlay = document.getElementById('overlay');
+
+    enter.addEventListener('click', () => {
+      window.location.href = 'reward.html';
+    });
+  </script>
 </body>
 </html>
