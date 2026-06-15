@@ -77,24 +77,7 @@ body.ready {
 .print-panel[data-panel="d"] { background-image:url('images/가림막4.png'); }
 
 #print-controls {
-  position:fixed;
-  right:24px;
-  bottom:24px;
-  z-index:20;
-  display:flex;
-  gap:8px;
-}
-
-#print-controls button {
-  appearance:none;
-  border:1px solid rgba(255,255,255,0.45);
-  background:rgba(0,0,0,0.45);
-  color:#ffffff;
-  padding:8px 10px;
-  font-size:11px;
-  letter-spacing:0.18em;
-  text-transform:uppercase;
-  cursor:pointer;
+  display:none;
 }
 
 @page {
