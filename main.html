@@ -26,19 +26,23 @@
   </div>
 
   <div id="viewport">
+    <!-- 1. 배경 이미지 레이어 -->
     <div id="layer-bg">
-      <div class="tile" style="left:0%;       top:0%"></div>
-      <div class="tile" style="left:33.3334%; top:0%"></div>
-      <div class="tile" style="left:66.6667%; top:0%"></div>
-      <div class="tile" style="left:0%;       top:33.3334%"></div>
-      <div class="tile" style="left:33.3334%; top:33.3334%"></div>
-      <div class="tile" style="left:66.6667%; top:33.3334%"></div>
-      <div class="tile" style="left:0%;       top:66.6667%"></div>
-      <div class="tile" style="left:33.3334%; top:66.6667%"></div>
-      <div class="tile" style="left:66.6667%; top:66.6667%"></div>
+      <div class="tile"></div>
+      <div class="tile"></div>
+      <div class="tile"></div>
+      <div class="tile"></div>
+      <div class="tile"></div>
+      <div class="tile"></div>
+      <div class="tile"></div>
+      <div class="tile"></div>
+      <div class="tile"></div>
     </div>
 
-    <!-- 조각들은 main.js가 동적으로 생성 -->
+    <!-- 2. 요소 PNG 전체를 얹는 레이어 -->
+    <div id="layer-elements"></div>
+
+    <!-- 3. 클릭 영역만 담당하는 투명 레이어 -->
     <div id="layer-mid"></div>
   </div>
 
