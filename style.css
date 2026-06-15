@@ -82,7 +82,7 @@ body {
   top: 3vh;
   right: 3vw;
   width: 36px;
-  z-index: 200;
+  z-index: 2000;
   cursor: pointer;
 }
 #home-btn img {
