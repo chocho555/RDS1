@@ -102,6 +102,12 @@ for (let row = 0; row < 3; row++) {
       el.dataset.title = p.title;
       el.dataset.desc  = p.desc;
 
+      // 26번 조각(옆에 있는 돌/장판 고정)을 길게 누르면 print 화면으로 이동
+      if (p.id === 26) {
+        el.classList.add('print-trigger');
+        el.title = 'hold to print';
+      }
+
       // 실제 이미지는 #layer-elements의 elements.png에서 보여주고,
       // 이 div는 팝업을 띄우기 위한 투명 클릭 영역만 담당한다.
       layerMid.appendChild(el);
@@ -191,6 +197,73 @@ document.addEventListener('touchend', () => {
 });
 
 applyParallax();
+
+/* ── 돌 길게 누르기 → print.html 이동 ──
+   26번 조각은 화면 왼쪽 아래에 있는 '장판 고정/돌' 이미지다.
+   짧게 클릭하면 기존처럼 팝업이 뜨고, 길게 누르면 현재 위치를 저장한 뒤
+   가림막이 덮인 print 화면으로 넘어간다. */
+const PRINT_TRIGGER_ID = '26';
+const LONG_PRESS_MS = 850;
+const LONG_PRESS_MOVE_LIMIT = 14;
+let longPressTimer = null;
+let longPressStartX = 0;
+let longPressStartY = 0;
+let longPressTarget = null;
+let suppressNextClick = false;
+
+function clearLongPress() {
+  if (longPressTimer) clearTimeout(longPressTimer);
+  longPressTimer = null;
+  longPressTarget = null;
+}
+
+function openPrintPage() {
+  const panelIds = ['a', 'b', 'c', 'd'];
+  const pickedPanels = shuffle(panelIds).slice(0, 2);
+
+  sessionStorage.setItem('hanPrintView', JSON.stringify({
+    x,
+    y,
+    bgSpeed: BG_SPEED,
+    elementSpeed: ELEMENT_SPEED,
+    panels: pickedPanels
+  }));
+
+  window.location.href = 'print.html';
+}
+
+document.addEventListener('pointerdown', e => {
+  const piece = e.target.closest('.piece');
+  if (!piece || piece.dataset.id !== PRINT_TRIGGER_ID) return;
+
+  longPressTarget = piece;
+  longPressStartX = e.clientX;
+  longPressStartY = e.clientY;
+
+  longPressTimer = setTimeout(() => {
+    suppressNextClick = true;
+    clearLongPress();
+    openPrintPage();
+  }, LONG_PRESS_MS);
+}, { passive: true });
+
+document.addEventListener('pointermove', e => {
+  if (!longPressTimer) return;
+  const dx = e.clientX - longPressStartX;
+  const dy = e.clientY - longPressStartY;
+  if (Math.hypot(dx, dy) > LONG_PRESS_MOVE_LIMIT) clearLongPress();
+}, { passive: true });
+
+document.addEventListener('pointerup', clearLongPress, { passive: true });
+document.addEventListener('pointercancel', clearLongPress, { passive: true });
+
+// 길게 누른 뒤 발생할 수 있는 click 이벤트가 팝업을 띄우지 않도록 막음
+document.addEventListener('click', e => {
+  if (!suppressNextClick) return;
+  e.preventDefault();
+  e.stopImmediatePropagation();
+  suppressNextClick = false;
+}, true);
 
 /* ── 팝업 시스템 (1번 클릭: title, 2번 클릭: desc) ── */
 const clickState = new Map();  // id → 'title' | 'desc'
