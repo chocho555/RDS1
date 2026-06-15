@@ -13,35 +13,49 @@ body {
   overflow:hidden;
 }
 
-#layer-bg, #layer-mid {
+#layer-bg,
+#layer-elements,
+#layer-mid {
   position:absolute;
   top:0; left:0;
   will-change:transform;
 }
 
-#layer-bg { z-index:1; }
+/* 아래 → 위 순서: 배경 / 요소 이미지 / 클릭 영역 */
+#layer-bg       { z-index:1; }
+#layer-elements { z-index:2; pointer-events:none; }
+#layer-mid      { z-index:3; pointer-events:none; }
 
-.tile {
+.tile,
+.element-tile {
   position:absolute;
-  background-image:url('images/bg/사문디_배경.jpg');
-  background-size:cover;
+  background-size:100% 100%;
+  background-repeat:no-repeat;
   background-position:center;
 }
 
-#layer-mid { z-index:2; }
+.tile {
+  background-image:url('images/bg/사문디_배경.jpg');
+}
 
-/* ── 조각 요소 ── */
+/* 사용자가 보낸 요소 파일: 투명 PNG라 배경 위에 자연스럽게 얹힘 */
+.element-tile {
+  background-image:url('images/elements.png');
+  pointer-events:none;
+}
+
+/* ── 조각 클릭 영역 ── */
 .piece {
   position: absolute;
   cursor: pointer;
-  overflow: hidden;
+  overflow: visible;
+  background: transparent;
+  pointer-events: auto;
 }
-.piece img {
-  display: block;
-  -webkit-user-drag: none;
-  user-select: none;
-  /* mix-blend-mode 제거 → 이미지 겹침 없앰 */
-}
+
+/* 요소 이미지는 layer-elements에서 한 장으로 보여주기 때문에
+   piece 내부 이미지는 만들지 않음 */
+.piece img { display:none; }
 
 /* ── 판 시스템 ── */
 .panel {
@@ -82,7 +96,7 @@ body {
   position:fixed; bottom:28px; left:50%;
   transform:translateX(-50%);
   z-index:100; font-size:10px; letter-spacing:0.3em;
-  color:rgba(0,0,0,0.3); text-transform:uppercase;
+  color:rgba(255,255,255,0.45); text-transform:uppercase;
   pointer-events:none; white-space:nowrap;
   transition:opacity 1s ease;
 }
