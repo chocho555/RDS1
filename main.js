@@ -1,16 +1,18 @@
 (() => {
   "use strict";
 
-  // ▼▼▼ 본인 이미지 파일명을 적으세요 (images/ 폴더에 넣고). 개수는 자유 ▼▼▼
+  // ▼▼▼ 본인 이미지 파일명 ▼▼▼
   const IMAGES = [
-    "images/01.jpg", "images/02.jpg", "images/03.jpg",
-    "images/04.jpg", "images/05.jpg", "images/06.jpg",
-    // ... 원하는 만큼 추가
+    "images/조각/001.jpg","images/조각/002.jpg","images/조각/003.jpg",
+    "images/조각/004.jpg","images/조각/005.jpg","images/조각/006.jpg",
+    "images/조각/007.jpg","images/조각/008.jpg","images/조각/009.jpg",
+    "images/조각/010.jpg","images/조각/011.jpg","images/조각/012.jpg",
+    "images/조각/013.jpg","images/조각/014.jpg","images/조각/015.jpg",
+    "images/조각/016.jpg","images/조각/017.jpg","images/조각/018.jpg",
   ];
-  // 무한 배경으로 깔 이미지 1장 (안 쓰려면 "" 로 비워두세요)
-  const BG_IMAGE = "images/01.jpg";
-  // ▲▲▲ 여기까지만 바꾸면 됩니다 ▲▲▲
-
+  // 무한 배경으로 깔 이미지 1장 (안 쓰려면 "" 로)
+  const BG_IMAGE = "images/조각/001.jpg";
+  // ▲▲▲ 여기까지 ▲▲▲
   const BG_PARALLAX = 0.34;          // 배경 시차(작을수록 멀고 느림)
   const DRIFT = { x:0.22, y:0.085 }; // 가만히 둘 때 자동 흐름 속도
   const INERTIA_DECAY = 0.93;
