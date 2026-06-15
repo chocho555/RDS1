@@ -11,7 +11,7 @@
     "images/조각/016.jpg","images/조각/017.jpg","images/조각/018.jpg",
   ];
   // 무한 배경으로 깔 이미지 1장 (안 쓰려면 "" 로)
-  const BG_IMAGE = "images/조각/001.jpg";
+  const BG_IMAGE = "images/조각/000.jpg";
   // ▲▲▲ 여기까지 ▲▲▲
   const BG_PARALLAX = 0.34;          // 배경 시차(작을수록 멀고 느림)
   const DRIFT = { x:0.22, y:0.085 }; // 가만히 둘 때 자동 흐름 속도
