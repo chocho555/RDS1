@@ -128,11 +128,14 @@ function srcRect(x, y, w, h) {
   };
 }
 
-const PRINT_TRIGGER_RECTS = [
-  // elements.png 원본 기준: 왼쪽 중하단의 장판 사진 전체.
-  // 이 안에 사용자가 말한 오른쪽 위 돌이 들어간다.
-  srcRect(0, 805, 245, 195)
+// elements.png 원본 기준 좌표.
+// 왼쪽 중하단 사진 안의 두 돌 전체를 넉넉하게 포함한다.
+// 특히 사용자가 말한 오른쪽 위 돌을 놓치지 않도록 실제 돌보다 훨씬 크게 잡았다.
+const PRINT_TRIGGER_SOURCE_RECTS = [
+  { x: 0, y: 790, w: 280, h: 240 }
 ];
+
+const PRINT_TRIGGER_RECTS = PRINT_TRIGGER_SOURCE_RECTS.map(r => srcRect(r.x, r.y, r.w, r.h));
 
 for (let row = 0; row < 3; row++) {
   for (let col = 0; col < 3; col++) {
@@ -182,6 +185,39 @@ function applyParallax() {
   layerBg.style.transform       = `translate(${bgX}px, ${bgY}px)`;
   layerElements.style.transform = `translate(${elX}px, ${elY}px)`;
   layerMid.style.transform      = `translate(${clickX}px, ${clickY}px)`;
+}
+
+function currentClickOffset() {
+  return {
+    x: wrap(x * CLICK_SPEED, TILE_W),
+    y: wrap(y * CLICK_SPEED, TILE_H)
+  };
+}
+
+function mod(val, size) {
+  return ((val % size) + size) % size;
+}
+
+function pointHitsPrintStone(clientX, clientY) {
+  const offset = currentClickOffset();
+
+  // 화면 좌표를 현재 움직인 elements.png 원본 좌표로 되돌려 계산한다.
+  // 이 방식은 투명 div가 클릭되지 않아도, 실제 화면에서 돌 위치를 누르면 감지된다.
+  const tileX = mod(clientX - offset.x, TILE_W);
+  const tileY = mod(clientY - offset.y, TILE_H);
+  const sourceX = tileX / SRC_TO_TILE_X;
+  const sourceY = tileY / SRC_TO_TILE_Y;
+
+  return PRINT_TRIGGER_SOURCE_RECTS.some(r => (
+    sourceX >= r.x &&
+    sourceX <= r.x + r.w &&
+    sourceY >= r.y &&
+    sourceY <= r.y + r.h
+  ));
+}
+
+function isPrintStoneEvent(e) {
+  return Boolean(e.target.closest('.print-trigger')) || pointHitsPrintStone(e.clientX, e.clientY);
 }
 
 function inertia() {
@@ -276,62 +312,41 @@ function openPrintPage() {
   window.location.assign('print.html');
 }
 
-document.addEventListener('pointerdown', e => {
-  const piece = e.target.closest('.print-trigger');
-  if (!piece) return;
-  e.preventDefault();
-
-  longPressTarget = piece;
-  longPressStartX = e.clientX;
-  longPressStartY = e.clientY;
+function beginPrintLongPress(clientX, clientY, target) {
+  clearLongPress();
+  longPressTarget = target || null;
+  longPressStartX = clientX;
+  longPressStartY = clientY;
 
   longPressTimer = setTimeout(() => {
     suppressNextClick = true;
     clearLongPress();
     openPrintPage();
   }, LONG_PRESS_MS);
-}, { passive: false, capture: true });
+}
 
-// 혹시 길게 누르기가 브라우저에서 씹히는 경우를 막기 위해
-// 같은 돌 영역은 짧게 클릭해도 print.html로 이동하게 했다.
-document.addEventListener('click', e => {
-  const piece = e.target.closest('.print-trigger');
-  if (!piece) return;
+document.addEventListener('pointerdown', e => {
+  if (!isPrintStoneEvent(e)) return;
   e.preventDefault();
-  e.stopImmediatePropagation();
-  clearLongPress();
-  openPrintPage();
-}, true);
+  e.stopPropagation();
+  beginPrintLongPress(e.clientX, e.clientY, e.target);
+}, { passive: false, capture: true });
 
 // Safari/iOS에서 pointer 이벤트가 불안정할 때를 위한 터치 보강.
 document.addEventListener('touchstart', e => {
-  const piece = e.target.closest('.print-trigger');
-  if (!piece) return;
-  const t = e.touches[0];
-  longPressTarget = piece;
-  longPressStartX = t.clientX;
-  longPressStartY = t.clientY;
-  if (longPressTimer) clearTimeout(longPressTimer);
-  longPressTimer = setTimeout(() => {
-    suppressNextClick = true;
-    clearLongPress();
-    openPrintPage();
-  }, LONG_PRESS_MS);
-}, { passive: true, capture: true });
+  const t = e.touches && e.touches[0];
+  if (!t || !pointHitsPrintStone(t.clientX, t.clientY)) return;
+  e.preventDefault();
+  e.stopPropagation();
+  beginPrintLongPress(t.clientX, t.clientY, e.target);
+}, { passive: false, capture: true });
 
 // 마우스 환경에서 pointer 이벤트가 안 잡히는 경우를 위한 보강.
 document.addEventListener('mousedown', e => {
-  const piece = e.target.closest('.print-trigger');
-  if (!piece) return;
-  longPressTarget = piece;
-  longPressStartX = e.clientX;
-  longPressStartY = e.clientY;
-  if (longPressTimer) clearTimeout(longPressTimer);
-  longPressTimer = setTimeout(() => {
-    suppressNextClick = true;
-    clearLongPress();
-    openPrintPage();
-  }, LONG_PRESS_MS);
+  if (!isPrintStoneEvent(e)) return;
+  e.preventDefault();
+  e.stopPropagation();
+  beginPrintLongPress(e.clientX, e.clientY, e.target);
 }, true);
 
 document.addEventListener('pointermove', e => {
@@ -344,18 +359,29 @@ document.addEventListener('pointermove', e => {
 document.addEventListener('pointerup', clearLongPress, { passive: true });
 document.addEventListener('pointercancel', clearLongPress, { passive: true });
 
-// 길게 누른 뒤 발생할 수 있는 click 이벤트가 팝업을 띄우지 않도록 막음
+// 돌은 길게 눌러도, 짧게 클릭해도 print.html로 넘어가게 한다.
+// 투명 div 클릭이 빗나가도 화면 좌표를 다시 계산해서 감지한다.
 document.addEventListener('click', e => {
-  if (!suppressNextClick) return;
-  e.preventDefault();
-  e.stopImmediatePropagation();
-  suppressNextClick = false;
+  if (suppressNextClick) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    suppressNextClick = false;
+    return;
+  }
+
+  if (isPrintStoneEvent(e)) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    clearLongPress();
+    openPrintPage();
+  }
 }, true);
 
 // 돌을 길게 누를 때 브라우저 기본 메뉴가 뜨지 않도록 막음
 document.addEventListener('contextmenu', e => {
-  if (e.target.closest('.print-trigger')) e.preventDefault();
+  if (isPrintStoneEvent(e)) e.preventDefault();
 });
+
 
 /* ── 팝업 시스템 ──
    현재 버전에서는 화면 위 글자가 뜨지 않도록 비활성화했다. */
@@ -460,11 +486,103 @@ function shuffle(arr) {
   return a;
 }
 
-function showPanels() {
-  panels.forEach(p => p.style.display = 'none');
-  const picked = shuffle(panels).slice(0, 2);
-  picked.forEach(p => p.style.display = 'block');
-  setTimeout(() => { picked.forEach(p => p.style.display = 'none'); }, 10000);
+const PANEL_INTERVAL_MS = 60000;
+const PANEL_VISIBLE_MS = 10000;
+const CAPTURE_STORE_KEY = 'hanPanelCaptures';
+const MAX_CAPTURE_COUNT = 40;
+
+let panelHideTimer = null;
+let isRoutingToPrint = false;
+
+function getPanelId(panel) {
+  return panel.id.replace('panel-', '');
 }
 
-setInterval(showPanels, 60000);
+function clearPanels() {
+  panels.forEach(panel => {
+    panel.style.display = 'none';
+    panel.classList.remove('active-for-print');
+  });
+  document.body.classList.remove('panel-printing');
+}
+
+function readStoredCaptures() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(CAPTURE_STORE_KEY) || '[]');
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (err) {
+    return [];
+  }
+}
+
+function writeStoredCaptures(captures) {
+  try {
+    localStorage.setItem(CAPTURE_STORE_KEY, JSON.stringify(captures));
+  } catch (err) {
+    // 저장 용량/권한 문제가 생겨도 웹 감상은 계속되게 둔다.
+  }
+}
+
+function hasStoredCaptures() {
+  return readStoredCaptures().length > 0;
+}
+
+function savePanelCapture(picked) {
+  const captures = readStoredCaptures();
+
+  captures.push({
+    x,
+    y,
+    bgSpeed: BG_SPEED,
+    elementSpeed: ELEMENT_SPEED,
+    panels: picked.map(getPanelId),
+    createdAt: Date.now()
+  });
+
+  writeStoredCaptures(captures.slice(-MAX_CAPTURE_COUNT));
+}
+
+function routeToPrintBeforeLeaving(afterUrl) {
+  if (!hasStoredCaptures()) {
+    window.location.href = afterUrl;
+    return;
+  }
+
+  isRoutingToPrint = true;
+  window.location.href = 'print.html?after=' + encodeURIComponent(afterUrl);
+}
+
+function showPanels() {
+  clearTimeout(panelHideTimer);
+  clearPanels();
+
+  const picked = shuffle(panels).slice(0, 2);
+
+  picked.forEach(panel => {
+    panel.style.display = 'block';
+    panel.classList.add('active-for-print');
+  });
+
+  document.body.classList.add('panel-printing');
+
+  // 가림막이 화면에 뜨는 순간, 현재 장면 정보를 캡쳐 목록에 저장한다.
+  // 실제 픽셀 스크린샷이 아니라, 배경 위치 + 요소 위치 + 가림막 조합을 저장해
+  // print.html에서 같은 화면을 다시 구성하는 방식이다.
+  savePanelCapture(picked);
+
+  panelHideTimer = setTimeout(() => {
+    clearPanels();
+  }, PANEL_VISIBLE_MS);
+}
+
+// 브라우저 탭을 닫거나 새로고침하는 순간에는 보안상 새 프린트창을 안정적으로 열 수 없다.
+// 대신 저장된 장면이 있으면 이탈 확인창을 띄워 실수로 캡쳐를 잃지 않게 한다.
+window.addEventListener('beforeunload', e => {
+  if (isRoutingToPrint || !hasStoredCaptures()) return;
+  e.preventDefault();
+  e.returnValue = '';
+});
+
+setInterval(showPanels, PANEL_INTERVAL_MS);
+
+window.routeToPrintBeforeLeaving = routeToPrintBeforeLeaving;
