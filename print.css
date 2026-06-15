@@ -1,0 +1,133 @@
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+html,
+body {
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:#000000;
+  font-family:'Courier New', monospace;
+}
+
+body {
+  opacity:0;
+  transition:opacity 0.35s ease;
+}
+
+body.ready {
+  opacity:1;
+}
+
+#print-stage {
+  position:fixed;
+  inset:0;
+  width:100vw;
+  height:100vh;
+  overflow:hidden;
+  background:#000000;
+}
+
+#print-layer-bg,
+#print-layer-elements {
+  position:absolute;
+  top:0;
+  left:0;
+  will-change:transform;
+}
+
+#print-layer-bg { z-index:1; }
+#print-layer-elements { z-index:2; pointer-events:none; }
+
+.print-tile,
+.print-element-tile {
+  position:absolute;
+  background-size:100% 100%;
+  background-repeat:no-repeat;
+  background-position:center;
+}
+
+.print-tile {
+  background-image:url('images/bg/사문디_배경.jpg');
+}
+
+.print-element-tile {
+  background-image:url('images/elements.png');
+}
+
+.print-panel {
+  display:none;
+  position:fixed;
+  inset:0;
+  width:100vw;
+  height:100vh;
+  z-index:5;
+  pointer-events:none;
+  background-size:100% 100%;
+  background-repeat:no-repeat;
+  background-position:center;
+}
+
+.print-panel.active {
+  display:block;
+}
+
+.print-panel[data-panel="a"] { background-image:url('images/가림막1.png'); }
+.print-panel[data-panel="b"] { background-image:url('images/가림막2.png'); }
+.print-panel[data-panel="c"] { background-image:url('images/가림막3.png'); }
+.print-panel[data-panel="d"] { background-image:url('images/가림막4.png'); }
+
+#print-controls {
+  position:fixed;
+  right:24px;
+  bottom:24px;
+  z-index:20;
+  display:flex;
+  gap:8px;
+}
+
+#print-controls button {
+  appearance:none;
+  border:1px solid rgba(255,255,255,0.45);
+  background:rgba(0,0,0,0.45);
+  color:#ffffff;
+  padding:8px 10px;
+  font-size:11px;
+  letter-spacing:0.18em;
+  text-transform:uppercase;
+  cursor:pointer;
+}
+
+@page {
+  size:A4 landscape;
+  margin:0;
+}
+
+@media print {
+  html,
+  body {
+    width:297mm;
+    height:210mm;
+    background:#000000;
+    overflow:hidden;
+    -webkit-print-color-adjust:exact;
+    print-color-adjust:exact;
+  }
+
+  #print-controls {
+    display:none !important;
+  }
+
+  #print-stage {
+    position:fixed;
+    inset:0;
+    width:100vw;
+    height:100vh;
+    overflow:hidden;
+    -webkit-print-color-adjust:exact;
+    print-color-adjust:exact;
+  }
+
+  .print-panel.active {
+    display:block !important;
+  }
+}
