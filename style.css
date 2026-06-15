@@ -93,12 +93,7 @@ body {
   opacity: 0.85;
 }
 #ui-hint {
-  position:fixed; bottom:28px; left:50%;
-  transform:translateX(-50%);
-  z-index:100; font-size:10px; letter-spacing:0.3em;
-  color:rgba(255,255,255,0.45); text-transform:uppercase;
-  pointer-events:none; white-space:nowrap;
-  transition:opacity 1s ease;
+  display:none;
 }
 #ui-hint.hidden { opacity:0; }
 
@@ -142,5 +137,5 @@ body {
 
 /* ── 길게 눌러 print 화면으로 넘어가는 숨은 트리거 ── */
 .print-trigger {
-  cursor: crosshair;
+  cursor: pointer;
 }
