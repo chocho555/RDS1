@@ -141,9 +141,75 @@ body {
   touch-action: none;
   -webkit-user-select: none;
   user-select: none;
+  z-index: 50;
 }
 
 /* 돌 이동 영역이 다른 투명 클릭 영역에 묻히지 않도록 가장 위에 둠 */
 .print-trigger {
   z-index: 50;
+}
+
+
+/* ── 가림막이 뜨는 순간 현재 화면 그대로 인쇄 ── */
+@page {
+  size: A4 landscape;
+  margin: 0;
+}
+
+@media print {
+  html,
+  body {
+    width: 297mm;
+    height: 210mm;
+    overflow: hidden !important;
+    background: #000000 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  #home-btn,
+  #ui-hint,
+  .popup,
+  .print-trigger {
+    display: none !important;
+  }
+
+  #viewport {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    overflow: hidden !important;
+    background: #000000 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  #layer-bg,
+  #layer-elements {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  #layer-mid {
+    display: none !important;
+  }
+
+  .panel {
+    display: none !important;
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 9999 !important;
+    background-size: 100% 100% !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .panel.active-for-print {
+    display: block !important;
+  }
 }
